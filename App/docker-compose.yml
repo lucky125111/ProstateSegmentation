@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  app:
+    container_name: apsnet
+    image: ${DOCKER_REGISTRY}app
+    build:
+      context: .
+      dockerfile: App/Dockerfile
+    depends_on:
+      - db
+  db:
+    container_name: mssql
+    image: "mcr.microsoft.com/mssql/server:2017-latest"
+    volumes:
+       - ./data/mssql:/var/opt/mssql
+    environment:
+        SA_PASSWORD: "sUper45!pas5word"
+        ACCEPT_EULA: "Y"
+    healthcheck:
+      test: sqlcmd -S localhost,1184 -U SA -P 'sUper45!pas5word' -Q 'select 1'
+    ports:
+      - "1184:1433"
