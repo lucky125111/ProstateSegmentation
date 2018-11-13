@@ -11,6 +11,16 @@ namespace App.Controllers
     public class ValuesController : ControllerBase
     {
         // GET api/values
+        /// <summary>
+        /// Get
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     Get
+        ///
+        /// </remarks>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
