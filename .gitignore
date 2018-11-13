@@ -467,3 +467,5 @@ ASALocalRun/
 
 # End of https://www.gitignore.io/api/aspnetcore,visualstudio
 App/data/mssql/data/
+
+App/data/mssql/
