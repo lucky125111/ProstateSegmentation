@@ -466,3 +466,4 @@ ASALocalRun/
 .localhistory/
 
 # End of https://www.gitignore.io/api/aspnetcore,visualstudio
+App/data/mssql/data/
