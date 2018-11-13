@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
@@ -10,6 +11,12 @@ namespace App.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly ILogger _logger;
+
+        public ValuesController(ILogger logger)
+        {
+            _logger = logger;
+        }
         // GET api/values
         /// <summary>
         /// Get
@@ -24,6 +31,7 @@ namespace App.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            _logger.LogError(null, "request");
             return new string[] { "value1", "value2" };
         }
 
