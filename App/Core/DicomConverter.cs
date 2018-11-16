@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
+using Core.Entity;
+using Core.Model;
+using Core.Model.DicomInput;
+using Core.Model.NewDicom;
 using Dicom;
 using Dicom.Imaging;
 
@@ -10,32 +14,54 @@ namespace Core
 {
     public class DicomConverter : IDicomConverter
     {
-        public void ConvertAndOpenDicom(string dicomBase64)
-        {
-            ConvertToDicom(dicomBase64);
-        }
-        
-        public DicomFile OpenDicom(string filePath)
-        {
-            var f = DicomFile.Open(filePath);
-            return f;
-        }
-
-        public Bitmap ConvertToDicom(string dicomBase64)
+        public NewDicomInputModel OpenDicomAndConvertToModel(string dicomBase64)
         {
             using (var stream = new MemoryStream((Convert.FromBase64String(dicomBase64))))
             {
-                var image = DicomFile.Open(stream);
-                var dcm = new DicomImage(image.Dataset);
-                //var image2 = new DicomImage(f2.Dataset);
+                var dicomFile = DicomFile.Open(stream);
+                var dicomImage = new DicomImage(dicomFile.Dataset);
 
-                var x = (byte[]) dcm.RenderImage().AsBytes();
-                var bitmap = new Bitmap(dcm.Width, dcm.Width, PixelFormat.Format32bppArgb);
-                var bitmap_data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                Marshal.Copy(x, 0, bitmap_data.Scan0, x.Length);
-                bitmap.UnlockBits(bitmap_data);
-                return bitmap;
+                return CreateDicomModel(dicomFile, dicomImage);
             }
+        }
+
+        private static NewDicomInputModel CreateDicomModel(DicomFile dicomFile, DicomImage dicomImage)
+        {
+            var patientData = GetPatientData(dicomFile);
+            var dicomImages = GetImages(dicomImage);
+            return new NewDicomInputModel(dicomImage.Width, dicomImage.Height, patientData.Id, patientData, dicomImages);
+        }
+
+        public NewDicomInputModel OpenDicomAndConvertFromFile(string path)
+        {
+            var dicomFile = DicomFile.Open(path);
+            var dicomImage = new DicomImage(dicomFile.Dataset);
+
+            return CreateDicomModel(dicomFile, dicomImage);
+        }
+
+        private static NewDicomPatientData GetPatientData(DicomFile dcm)
+        {
+            var id = dcm.Dataset.GetValue<string>(DicomTag.PatientID, 0);
+            //todo get other properties
+            return new NewDicomPatientData(id);
+        }
+
+        private static ICollection<NewDicomSlice> GetImages(DicomImage dcm)
+        {
+            return GetImagesAsByteList(dcm).Select((x, index) => new NewDicomSlice(x, index)) as ICollection<NewDicomSlice>;
+        }
+
+        private static List<byte[]> GetImagesAsByteList(DicomImage dcm)
+        {
+            var l = new List<byte[]>();
+
+            for (int i = 0; i < dcm.NumberOfFrames; i++)
+            {
+                l.Add(dcm.ToBytes(i));
+            }
+
+            return l;
         }
     }
 }

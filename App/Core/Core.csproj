@@ -7,9 +7,19 @@
 
   <ItemGroup>
     <PackageReference Include="fo-dicom.NetCore" Version="4.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>C:\Users\Administrator\.nuget\packages\autofac\4.6.1\lib\netstandard1.1\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper">
+      <HintPath>C:\Users\Administrator\.nuget\packages\automapper\5.1.1\lib\netstandard1.3\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Debug">
+      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.logging.debug\2.1.1\lib\netstandard2.0\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing.Common">
       <HintPath>C:\Users\Administrator\.nuget\packages\system.drawing.common\4.5.1\ref\netstandard2.0\System.Drawing.Common.dll</HintPath>
     </Reference>

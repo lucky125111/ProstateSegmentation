@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   app:
-    container_name: apsnet
+    container_name: aspnet
     image: ${DOCKER_REGISTRY}app
     build:
       context: .
@@ -17,7 +17,5 @@ services:
     environment:
         SA_PASSWORD: "sUper45!pas5word"
         ACCEPT_EULA: "Y"
-    healthcheck:
-      test: sqlcmd -S localhost,1184 -U SA -P "sUper45!pas5word" -Q "select 1"
     ports:
       - "1184:1433"
