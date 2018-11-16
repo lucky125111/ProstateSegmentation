@@ -7,15 +7,22 @@ namespace Core.Model.NewDicom
     public class DicomPatientData
     {
         //other properties
-        public string DicomModelId { get; set; }
+        public string DicomPatientId { get; set; }
+        
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int DicomModelId { get; set; }
 
         public DicomModel DicomModel { get; set; }
 
+        public DicomPatientData(string dicomModelId, int dicomPatientId)
+        {
+            DicomModelId = dicomPatientId;
+            DicomPatientId = dicomModelId;
+        }
         public DicomPatientData(string dicomModelId)
         {
-            DicomModelId = dicomModelId;
+            DicomPatientId = dicomModelId;
         }
-
         public DicomPatientData()
         {
             

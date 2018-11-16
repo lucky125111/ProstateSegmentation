@@ -49,7 +49,8 @@ namespace Core
 
         private static ICollection<NewDicomSlice> GetImages(DicomImage dcm)
         {
-            return GetImagesAsByteList(dcm).Select((x, index) => new NewDicomSlice(x, index)) as ICollection<NewDicomSlice>;
+            var list = GetImagesAsByteList(dcm).Select((x, index) => new NewDicomSlice(x, index)).ToList();
+            return list;
         }
 
         private static List<byte[]> GetImagesAsByteList(DicomImage dcm)
