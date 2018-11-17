@@ -2,7 +2,7 @@
 using Autofac;
 using AutoMapper;
 
-namespace Core.Autofac
+namespace App.Autofac
 {
     public class MapperModule : Module
     {

@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 
-namespace Core.Autofac
+namespace App.Autofac
 {
     public class LoggerModule : Module
     {

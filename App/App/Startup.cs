@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using App.Autofac;
 using Autofac;
-using Core.Autofac;
+using Core;
 using Core.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -65,7 +66,7 @@ namespace App
         {
             builder.RegisterModule(new LoggerModule());
             builder.RegisterModule(new MapperModule());
-
+            
             builder.RegisterType<DicomContext>()
                 .WithParameter("connectionString",
                     Configuration.GetConnectionString("DefaultConnection"))

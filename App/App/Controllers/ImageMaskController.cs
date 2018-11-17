@@ -6,23 +6,23 @@ namespace App.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class NewDicomController : ControllerBase
+    public class ImageMaskController : ControllerBase
     {
         /// <summary>
-        ///     Upload DICOM, and calculate it's mask
+        ///     Upload DICOM slices, and recalculate mask
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /NewDicom
+        ///     POST /NewDicom{id}
         ///     {
         ///        "id": 1,
         ///     }
         ///
         /// </remarks>
-        /// <returns>generated patient id</returns>
-        [HttpPost]
-        public async Task<PatientId> UploadNewDicom(NewDicom newDicom)
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<DicomSliceModel> GetImage(SliceModelId patientId)
         {
             return null;
         }
@@ -40,10 +40,10 @@ namespace App.Controllers
         ///
         /// </remarks>
         /// <returns></returns>
-        [HttpPost("UpdateImages")]
-        public async Task<PatientId> UploadNewDicomImages(NewDicomSilces patientId)
+        [HttpPost]
+        public async Task<bool> UpdateMask(NewMaskModel maskModel)
         {
-            return null;
+            return false;
         }
     }
 }

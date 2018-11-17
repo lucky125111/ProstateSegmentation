@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Context;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
@@ -13,21 +15,10 @@ namespace App.Controllers
     {
         private readonly ILogger _logger;
 
-        public ValuesController(ILogger logger)
+        public ValuesController(ILogger logger, DicomContext context)
         {
             _logger = logger;
         }
-        // GET api/values
-        /// <summary>
-        /// Get
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     Get
-        ///
-        /// </remarks>
-        /// <returns></returns>
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {

@@ -23,7 +23,7 @@ namespace Core
             var d1 = dcmConverter.OpenDicomAndConvertFromFile(
                 @"D:\Inzynierka\src\Data\CT.rtp1.12.20080627A.CHESTPHANTOM.T.-.3.CT.dcm");
             var d2 = dcmConverter.OpenDicomAndConvertFromFile(
-                @"D:\Inzynierka\src\Data\CT.rtp1.12.20080627A.CHESTPHANTOM.T.2.3.CT.dcm");
+                @"D:\Inzynierka\src\Data\DOSE.20080627A.TRAINING4FLD.dcm");
 
             var e1 = new DicomModel(d1.ImageWidth, d1.ImageHeight, d1.PatientId);
             var e2 = new DicomModel(d2.ImageWidth, d2.ImageHeight, d2.PatientId);
