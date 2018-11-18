@@ -12,6 +12,8 @@ namespace Core.Entity
         public int ImageWidth { get; set; }
         public int ImageHeight { get; set; }
 
+        //todo image details
+
         public NewDicomPatientData DicomPatientData { get; set; }
         public ICollection<NewDicomSlice> DicomSlices { get; }
 

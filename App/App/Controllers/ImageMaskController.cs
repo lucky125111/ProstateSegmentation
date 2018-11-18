@@ -22,7 +22,7 @@ namespace App.Controllers
         /// </remarks>
         /// <returns></returns>
         [HttpGet]
-        public async Task<DicomSliceModel> GetImage(SliceModelId patientId)
+        public async Task<DicomSliceModel> GetImage([FromQuery]SliceModelId patientId)
         {
             return null;
         }

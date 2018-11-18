@@ -2,5 +2,6 @@
 {
     public class PatientDataViewModel
     {
+        public int NumberOfImages { get; set; }
     }
 }

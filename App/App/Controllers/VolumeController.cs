@@ -22,7 +22,7 @@ namespace App.Controllers
         /// </remarks>
         /// <returns></returns>
         [HttpGet]
-        public async Task<VolumeModel> GetVolume(PatientId patientId)
+        public async Task<VolumeModel> GetVolume([FromQuery]PatientId patientId)
         {
             return null;
         }

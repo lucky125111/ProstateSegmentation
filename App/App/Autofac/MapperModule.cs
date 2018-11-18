@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Autofac;
 using AutoMapper;
+using Core.Entity;
 
 namespace App.Autofac
 {
@@ -8,7 +9,7 @@ namespace App.Autofac
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterAssemblyTypes(typeof(MapperModule).Assembly)
+            builder.RegisterAssemblyTypes(typeof(DicomModel).Assembly)
                 .Where(t => t.BaseType == typeof(Profile)
                             && !t.IsAbstract && t.IsPublic)
                 .As<Profile>();

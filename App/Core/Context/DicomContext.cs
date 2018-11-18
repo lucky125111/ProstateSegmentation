@@ -29,7 +29,7 @@ namespace Core.Context
                 .HasOne(a => a.DicomPatientData)
                 .WithOne(b => b.DicomModel)
                 .HasForeignKey<DicomPatientData>(b => b.DicomModelId);
-
+            
             modelBuilder.Entity<DicomModel>()
                 .HasMany(s => s.DicomImages)
                 .WithOne(g => g.DicomModel)

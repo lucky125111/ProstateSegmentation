@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Core.Context;
+using Core.Dicom;
 using Core.Entity;
 using Core.Model.NewDicom;
 

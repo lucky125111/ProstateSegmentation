@@ -4,6 +4,9 @@
     {
         public string Id { get; set; }
 
+        //todo
+        public string PatientName { get; set; }
+
         //other properties
         public NewDicomPatientData(string id)
         {
