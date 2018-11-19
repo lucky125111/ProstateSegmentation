@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Dicom.Imaging;
 namespace Core.Dicom
@@ -15,9 +17,15 @@ namespace Core.Dicom
         public static Bitmap RenderAsBitmap(this DicomImage dcm, int frame = 0)
         {
             var x = dcm.ToBytes(frame);
-            var bitmap = new Bitmap(dcm.Width, dcm.Width, PixelFormat.Format32bppArgb);
-            var bitmap_data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(x, 0, bitmap_data.Scan0, x.Length);
+            return x.RenderBitmap(dcm.Width, dcm.Height);
+        }
+
+        public static Bitmap RenderBitmap(this byte[] bytes, int dcmWidth, int dcmHeight)
+        {            
+            var bitmap = new Bitmap(dcmWidth, dcmHeight, PixelFormat.Format32bppArgb);
+            var bitmap_data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly,
+                PixelFormat.Format32bppArgb);
+            Marshal.Copy(bytes, 0, bitmap_data.Scan0, bytes.Length);
             bitmap.UnlockBits(bitmap_data);
             return bitmap;
         }
@@ -33,6 +41,6 @@ namespace Core.Dicom
 
             return bytedata;
         }
-
+        public static string Join(this IEnumerable<string> strings, string sep) => String.Join(sep, strings.ToArray());
     }
 }

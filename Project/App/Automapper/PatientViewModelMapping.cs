@@ -9,7 +9,6 @@ namespace App.Automapper
         public PatientViewModelMapping()
         {
             CreateMap<DicomPatientData, PatientViewModel>()
-                .ForMember(dest => dest.PatientId, opt => opt.MapFrom(src => src.PatientId))
                 .ForMember(dest => dest.DicomId, opt => opt.MapFrom(src => src.DicomModelId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.PatientName))
                 ;

@@ -10,18 +10,18 @@ namespace Core.Entity
     {
         public int ImageWidth { get; set; }
         public int ImageHeight { get; set; }
-        public int DistanceBetweenSlices { get; set; }
-        public double PixelSize { get; set; }
-
+        public double? PixelSize { get; set; }
+        public double? PixelSpacingVertical {get; set;}
+        public double? PixelSpacingHorizontal {get; set;}
+        public double? SliceThickness {get; set;}
+        public double? SpacingBetweenSlices {get; set;}
         //todo image details
 
         public NewDicomPatientData DicomPatientData { get; set; }
         public ICollection<NewDicomSlice> DicomSlices { get; }
 
-        public NewDicomInputModel(int imageWidth, int imageHeight, NewDicomPatientData dicomPatientData, ICollection<NewDicomSlice> dicomSlices)
+        public NewDicomInputModel(NewDicomPatientData dicomPatientData, ICollection<NewDicomSlice> dicomSlices)
         {
-            ImageWidth = imageWidth;
-            ImageHeight = imageHeight;
             DicomPatientData = dicomPatientData;
             DicomSlices = dicomSlices;
         }

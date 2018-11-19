@@ -100,7 +100,7 @@ namespace App.Controllers
             var dataModel = new VolumeDataModel()
             {
                 Masks = mask,
-                distanceBetweenSlicesmm = dicom.DistanceBetweenSlices,
+                distanceBetweenSlicesmm = dicom.SpacingBetweenSlices,
                 pixelSizeInmm = dicom.PixelSize
             };
 

@@ -26,7 +26,16 @@ namespace Core.Dicom
         {
             var patientData = GetPatientData(dicomFile);
             var dicomImages = GetImages(dicomImage);
-            return new NewDicomInputModel(dicomImage.Width, dicomImage.Height, patientData, dicomImages);
+            
+            return new NewDicomInputModel(patientData, dicomImages)
+            {
+                ImageWidth = dicomImage.Width,
+                ImageHeight = dicomImage.Height,
+                PixelSpacingVertical = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing,0),
+                PixelSpacingHorizontal = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing,1),
+                SliceThickness = GetDicomDecimalTag(dicomFile, DicomTag.SliceThickness,0),
+                SpacingBetweenSlices = GetDicomDecimalTag(dicomFile, DicomTag.SpacingBetweenSlices,0),
+            };
         }
 
         public NewDicomInputModel OpenDicomAndConvertFromFile(string path)
@@ -39,10 +48,59 @@ namespace Core.Dicom
 
         private static NewDicomPatientData GetPatientData(DicomFile dcm)
         {
-            var id = dcm.Dataset.GetValue<string>(DicomTag.PatientID, 0);
-            var name = dcm.Dataset.GetValue<string>(DicomTag.PatientName, 0);
-            //todo get other properties
-            return new NewDicomPatientData(id, name);
+            var id = dcm.Dataset.GetValues<string>(DicomTag.PatientID).Join(@"\");
+            var name = dcm.Dataset.GetValues<string>(DicomTag.PatientName).Join(@"\");
+
+            return new NewDicomPatientData(id, name)
+            {
+                IssuerOfPatientID = GetDicomTag(dcm, DicomTag.IssuerOfPatientID),
+                TypeOfPatientID = GetDicomTag(dcm, DicomTag.TypeOfPatientID),
+                IssuerOfPatientIDQualifiersSequence = GetDicomTag(dcm, DicomTag.IssuerOfPatientIDQualifiersSequence),
+                SourcePatientGroupIdentificationSequence = GetDicomTag(dcm, DicomTag.SourcePatientGroupIdentificationSequence),
+                GroupOfPatientsIdentificationSequence = GetDicomTag(dcm, DicomTag.GroupOfPatientsIdentificationSequence),
+                SubjectRelativePositionInImage = GetDicomTag(dcm, DicomTag.SubjectRelativePositionInImage),
+                PatientBirthDate = GetDicomTag(dcm, DicomTag.PatientBirthDate),
+                PatientBirthTime = GetDicomTag(dcm, DicomTag.PatientBirthTime),
+                PatientBirthDateInAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientBirthDateInAlternativeCalendar),
+                PatientDeathDateInAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientDeathDateInAlternativeCalendar),
+                PatientAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientAlternativeCalendar),
+                PatientSex = GetDicomTag(dcm, DicomTag.PatientSex),
+                PatientBirthName = GetDicomTag(dcm, DicomTag.PatientBirthName),
+                PatientAge = GetDicomTag(dcm, DicomTag.PatientAge),
+                PatientSize = GetDicomTag(dcm, DicomTag.PatientSize),
+                PatientSizeCodeSequence = GetDicomTag(dcm, DicomTag.PatientSizeCodeSequence),
+                PatientBodyMassIndex = GetDicomTag(dcm, DicomTag.PatientBodyMassIndex),
+                MeasuredAPDimension = GetDicomTag(dcm, DicomTag.MeasuredAPDimension),
+                MeasuredLateralDimension = GetDicomTag(dcm, DicomTag.MeasuredLateralDimension),
+                PatientWeight = GetDicomTag(dcm, DicomTag.PatientWeight),
+                PatientAddress = GetDicomTag(dcm, DicomTag.PatientAddress),
+                PatientMotherBirthName = GetDicomTag(dcm, DicomTag.PatientMotherBirthName),
+            };
+        }
+
+        public static string GetDicomTag(DicomFile dcm, DicomTag tag)
+        {
+            try
+            {
+                var strings = dcm.Dataset.GetValues<string>(tag);
+                return strings.Join(@"\");
+            }
+            catch (DicomDataException e)
+            {
+                return null;
+            }
+        }
+
+        public static double? GetDicomDecimalTag(DicomFile dcm, DicomTag tag, int frame)
+        {
+            try
+            {
+                return dcm.Dataset.GetValue<double>(tag, frame);
+            }
+            catch (DicomDataException e)
+            {
+                return null;
+            }
         }
 
         private static ICollection<NewDicomSlice> GetImages(DicomImage dcm)
