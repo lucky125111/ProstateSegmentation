@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-using App.Models;
+﻿using App.Models;
 using AutoMapper;
-using Core.Context;
 using Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,9 +10,9 @@ namespace App.Controllers
     [ApiController]
     public class DicomSliceController : ControllerBase
     {
-        private readonly IDicomSliceRepository _repository;
-        private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly IDicomSliceRepository _repository;
 
         public DicomSliceController(IDicomSliceRepository repository, IMapper mapper, ILogger logger)
         {
@@ -22,23 +20,22 @@ namespace App.Controllers
             _mapper = mapper;
             _logger = logger;
         }
+
         /// <summary>
         ///     Get image for DICOM slice
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
+        ///     Sample request:
         ///     GET /api/DicomMask
         ///     {
-        ///        "PatientId.PatientId": 1,
-        ///        "SliceIndex": 1
+        ///     "PatientId.PatientId": 1,
+        ///     "SliceIndex": 1
         ///     }
-        ///
         /// </remarks>
         /// <param name="patientId">PatientId's of DICOM and slice</param>
         /// <returns>returns DicomSliceModel representing image object</returns>
         [HttpGet]
-        public DicomSliceModel GetImage([FromQuery]SliceModelId patientId)
+        public DicomSliceModel GetImage([FromQuery] SliceModelId patientId)
         {
             var image = _repository.GetSliceById(patientId.PatientId.Id, patientId.SliceIndex);
             if (image == null)
@@ -46,7 +43,7 @@ namespace App.Controllers
                 Response.StatusCode = 404;
                 return null;
             }
-            
+
             return new DicomSliceModel(image);
         }
     }

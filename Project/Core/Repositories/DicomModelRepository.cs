@@ -8,11 +8,13 @@ namespace Core.Repositories
     {
         private readonly DicomContext _dicomContext;
 
+        private bool _disposed;
+
         public DicomModelRepository(DicomContext dicomContext)
         {
             _dicomContext = dicomContext;
         }
-        
+
         public DicomModel GetDicomModelById(int patientId)
         {
             return _dicomContext.DicomModels.Find(patientId);
@@ -28,24 +30,18 @@ namespace Core.Repositories
             _dicomContext.SaveChanges();
         }
 
-        private bool _disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this._disposed)
-            {
-                if (disposing)
-                {
-                    _dicomContext.Dispose();
-                }
-            }
-            this._disposed = true;
-        }
-
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+                if (disposing)
+                    _dicomContext.Dispose();
+            _disposed = true;
         }
     }
 }

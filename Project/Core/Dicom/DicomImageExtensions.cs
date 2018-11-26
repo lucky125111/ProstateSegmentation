@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Dicom.Imaging;
+
 namespace Core.Dicom
 {
     public static class DicomImageExtensions
     {
         public static byte[] ToBytes(this DicomImage dcm, int frame = 0)
         {
-            return (byte[]) dcm.RenderImage(frame).AsBytes();
+            return dcm.RenderImage(frame).AsBytes();
         }
 
         public static Bitmap RenderAsBitmap(this DicomImage dcm, int frame = 0)
@@ -21,7 +21,7 @@ namespace Core.Dicom
         }
 
         public static Bitmap RenderBitmap(this byte[] bytes, int dcmWidth, int dcmHeight)
-        {            
+        {
             var bitmap = new Bitmap(dcmWidth, dcmHeight, PixelFormat.Format32bppArgb);
             var bitmap_data = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly,
                 PixelFormat.Format32bppArgb);
@@ -32,15 +32,20 @@ namespace Core.Dicom
 
         public static byte[] ToBytes(this Bitmap image)
         {
-            var bmpdata = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
-            int numbytes = bmpdata.Stride * image.Height;
-            byte[] bytedata = new byte[numbytes];
-            IntPtr ptr = bmpdata.Scan0;
+            var bmpdata = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
+                image.PixelFormat);
+            var numbytes = bmpdata.Stride * image.Height;
+            var bytedata = new byte[numbytes];
+            var ptr = bmpdata.Scan0;
 
             Marshal.Copy(ptr, bytedata, 0, numbytes);
 
             return bytedata;
         }
-        public static string Join(this IEnumerable<string> strings, string sep) => String.Join(sep, strings.ToArray());
+
+        public static string Join(this IEnumerable<string> strings, string sep)
+        {
+            return string.Join(sep, strings.ToArray());
+        }
     }
 }

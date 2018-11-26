@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace Volume.Tests
@@ -8,7 +7,6 @@ namespace Volume.Tests
         [Fact]
         public void Test1()
         {
-
         }
     }
 }

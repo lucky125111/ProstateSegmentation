@@ -11,6 +11,8 @@ namespace Core.Repositories
     {
         private readonly DicomContext _dicomContext;
 
+        private bool _disposed;
+
         public DicomSliceRepository(DicomContext dicomContext)
         {
             _dicomContext = dicomContext;
@@ -19,13 +21,13 @@ namespace Core.Repositories
         public IEnumerable<byte[]> GetSlices(int patientId)
         {
             var dicomSlices = _dicomContext.DicomSlices.Where(x => x.DicomModelId == patientId);
-            return !dicomSlices.Any() ? null : dicomSlices.Select(x => x.Image).AsEnumerable<byte[]>();
+            return !dicomSlices.Any() ? null : dicomSlices.Select(x => x.Image).AsEnumerable();
         }
 
         public IEnumerable<byte[]> GetMasks(int patientId)
         {
             var dicomSlices = _dicomContext.DicomSlices.Where(x => x.DicomModelId == patientId);
-            return !dicomSlices.Any() ? null : dicomSlices.Select(x => x.Mask).AsEnumerable<byte[]>();
+            return !dicomSlices.Any() ? null : dicomSlices.Select(x => x.Mask).AsEnumerable();
         }
 
         public DicomSlice GetDicomSlice(int patientId, int sliceId)
@@ -35,11 +37,11 @@ namespace Core.Repositories
 
         public byte[] GetSliceById(int patientId, int sliceId)
         {
-            return  _dicomContext.DicomSlices.Find(patientId, sliceId)?.Image;
+            return _dicomContext.DicomSlices.Find(patientId, sliceId)?.Image;
         }
 
         public byte[] GetMaskById(int patientId, int sliceId)
-        {            
+        {
             return _dicomContext.DicomSlices.Find(patientId, sliceId)?.Mask;
         }
 
@@ -55,10 +57,7 @@ namespace Core.Repositories
 
         public void InsertSlices(IEnumerable<DicomSlice> dicomSlices)
         {
-            foreach (var slice in dicomSlices)
-            {
-                InsertSlice(slice);
-            }
+            foreach (var slice in dicomSlices) InsertSlice(slice);
         }
 
         public void Save()
@@ -66,24 +65,18 @@ namespace Core.Repositories
             _dicomContext.SaveChanges();
         }
 
-        private bool _disposed = false;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this._disposed)
-            {
-                if (disposing)
-                {
-                    _dicomContext.Dispose();
-                }
-            }
-            this._disposed = true;
-        }
-
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+                if (disposing)
+                    _dicomContext.Dispose();
+            _disposed = true;
         }
     }
 }

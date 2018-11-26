@@ -22,28 +22,28 @@ namespace Core.Dicom
             }
         }
 
-        private static NewDicomInputModel CreateDicomModel(DicomFile dicomFile, DicomImage dicomImage)
-        {
-            var patientData = GetPatientData(dicomFile);
-            var dicomImages = GetImages(dicomImage);
-            
-            return new NewDicomInputModel(patientData, dicomImages)
-            {
-                ImageWidth = dicomImage.Width,
-                ImageHeight = dicomImage.Height,
-                PixelSpacingVertical = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing,0),
-                PixelSpacingHorizontal = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing,1),
-                SliceThickness = GetDicomDecimalTag(dicomFile, DicomTag.SliceThickness,0),
-                SpacingBetweenSlices = GetDicomDecimalTag(dicomFile, DicomTag.SpacingBetweenSlices,0),
-            };
-        }
-
         public NewDicomInputModel OpenDicomAndConvertFromFile(string path)
         {
             var dicomFile = DicomFile.Open(path);
             var dicomImage = new DicomImage(dicomFile.Dataset);
 
             return CreateDicomModel(dicomFile, dicomImage);
+        }
+
+        private static NewDicomInputModel CreateDicomModel(DicomFile dicomFile, DicomImage dicomImage)
+        {
+            var patientData = GetPatientData(dicomFile);
+            var dicomImages = GetImages(dicomImage);
+
+            return new NewDicomInputModel(patientData, dicomImages)
+            {
+                ImageWidth = dicomImage.Width,
+                ImageHeight = dicomImage.Height,
+                PixelSpacingVertical = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing, 0),
+                PixelSpacingHorizontal = GetDicomDecimalTag(dicomFile, DicomTag.PixelSpacing, 1),
+                SliceThickness = GetDicomDecimalTag(dicomFile, DicomTag.SliceThickness, 0),
+                SpacingBetweenSlices = GetDicomDecimalTag(dicomFile, DicomTag.SpacingBetweenSlices, 0)
+            };
         }
 
         private static NewDicomPatientData GetPatientData(DicomFile dcm)
@@ -56,13 +56,17 @@ namespace Core.Dicom
                 IssuerOfPatientID = GetDicomTag(dcm, DicomTag.IssuerOfPatientID),
                 TypeOfPatientID = GetDicomTag(dcm, DicomTag.TypeOfPatientID),
                 IssuerOfPatientIDQualifiersSequence = GetDicomTag(dcm, DicomTag.IssuerOfPatientIDQualifiersSequence),
-                SourcePatientGroupIdentificationSequence = GetDicomTag(dcm, DicomTag.SourcePatientGroupIdentificationSequence),
-                GroupOfPatientsIdentificationSequence = GetDicomTag(dcm, DicomTag.GroupOfPatientsIdentificationSequence),
+                SourcePatientGroupIdentificationSequence =
+                    GetDicomTag(dcm, DicomTag.SourcePatientGroupIdentificationSequence),
+                GroupOfPatientsIdentificationSequence =
+                    GetDicomTag(dcm, DicomTag.GroupOfPatientsIdentificationSequence),
                 SubjectRelativePositionInImage = GetDicomTag(dcm, DicomTag.SubjectRelativePositionInImage),
                 PatientBirthDate = GetDicomTag(dcm, DicomTag.PatientBirthDate),
                 PatientBirthTime = GetDicomTag(dcm, DicomTag.PatientBirthTime),
-                PatientBirthDateInAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientBirthDateInAlternativeCalendar),
-                PatientDeathDateInAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientDeathDateInAlternativeCalendar),
+                PatientBirthDateInAlternativeCalendar =
+                    GetDicomTag(dcm, DicomTag.PatientBirthDateInAlternativeCalendar),
+                PatientDeathDateInAlternativeCalendar =
+                    GetDicomTag(dcm, DicomTag.PatientDeathDateInAlternativeCalendar),
                 PatientAlternativeCalendar = GetDicomTag(dcm, DicomTag.PatientAlternativeCalendar),
                 PatientSex = GetDicomTag(dcm, DicomTag.PatientSex),
                 PatientBirthName = GetDicomTag(dcm, DicomTag.PatientBirthName),
@@ -74,7 +78,7 @@ namespace Core.Dicom
                 MeasuredLateralDimension = GetDicomTag(dcm, DicomTag.MeasuredLateralDimension),
                 PatientWeight = GetDicomTag(dcm, DicomTag.PatientWeight),
                 PatientAddress = GetDicomTag(dcm, DicomTag.PatientAddress),
-                PatientMotherBirthName = GetDicomTag(dcm, DicomTag.PatientMotherBirthName),
+                PatientMotherBirthName = GetDicomTag(dcm, DicomTag.PatientMotherBirthName)
             };
         }
 
@@ -85,7 +89,7 @@ namespace Core.Dicom
                 var strings = dcm.Dataset.GetValues<string>(tag);
                 return strings.Join(@"\");
             }
-            catch (DicomDataException e)
+            catch (DicomDataException)
             {
                 return null;
             }
@@ -97,7 +101,7 @@ namespace Core.Dicom
             {
                 return dcm.Dataset.GetValue<double>(tag, frame);
             }
-            catch (DicomDataException e)
+            catch (DicomDataException)
             {
                 return null;
             }
@@ -113,10 +117,7 @@ namespace Core.Dicom
         {
             var l = new List<byte[]>();
 
-            for (int i = 0; i < dcm.NumberOfFrames; i++)
-            {
-                l.Add(dcm.ToBytes(i));
-            }
+            for (var i = 0; i < dcm.NumberOfFrames; i++) l.Add(dcm.ToBytes(i));
 
             return l;
         }

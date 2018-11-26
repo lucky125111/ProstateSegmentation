@@ -7,21 +7,20 @@ namespace Core.Context
     public class DicomContext : DbContext
     {
         private readonly string _connectionString;
+
         public DicomContext(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(_connectionString);
-            }
-        }
         public DbSet<DicomModel> DicomModels { get; set; }
         public DbSet<DicomPatientData> DicomPatientDatas { get; set; }
-        public DbSet<DicomSlice> DicomSlices{ get; set; }
+        public DbSet<DicomSlice> DicomSlices { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured) optionsBuilder.UseSqlServer(_connectionString);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +28,7 @@ namespace Core.Context
                 .HasOne(a => a.DicomPatientData)
                 .WithOne(b => b.DicomModel)
                 .HasForeignKey<DicomPatientData>(b => b.DicomModelId);
-            
+
             modelBuilder.Entity<DicomModel>()
                 .HasMany(s => s.DicomImages)
                 .WithOne(g => g.DicomModel)

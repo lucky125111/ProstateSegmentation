@@ -2,7 +2,6 @@
 using System.Reflection;
 using Autofac;
 using AutoMapper;
-using Core.Entity;
 using Module = Autofac.Module;
 
 namespace App.Autofac
@@ -22,8 +21,13 @@ namespace App.Autofac
                     cfg.AddProfile(profile);
             }));
 
-            builder.Register(ctx => ctx.Resolve<MapperConfiguration>()
-                    .CreateMapper())
+            builder.Register(ctx =>
+                {
+                    var mapper = ctx.Resolve<MapperConfiguration>()
+                        .CreateMapper();
+                    mapper.ConfigurationProvider.AssertConfigurationIsValid();
+                    return mapper;
+                })
                 .As<IMapper>()
                 .SingleInstance();
         }

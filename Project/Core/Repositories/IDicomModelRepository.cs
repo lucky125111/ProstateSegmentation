@@ -3,7 +3,7 @@ using Core.Entity;
 
 namespace Core.Repositories
 {
-    public interface IDicomModelRepository: IDisposable
+    public interface IDicomModelRepository : IDisposable
     {
         DicomModel GetDicomModelById(int patientId);
         void InsertDicom(DicomModel dicomModel);

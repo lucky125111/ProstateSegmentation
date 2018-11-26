@@ -21,7 +21,7 @@ namespace App.Automapper
                 .ForMember(dest => dest.DicomModel, opt => opt.Ignore())
                 .ForMember(dest => dest.DicomModelId, opt => opt.Ignore())
                 ;
-            
+
             CreateMap<NewDicomSlice, DicomSlice>()
                 .ForMember(dest => dest.Mask, opt => opt.Ignore())
                 .ForMember(dest => dest.DicomModelId, opt => opt.Ignore())

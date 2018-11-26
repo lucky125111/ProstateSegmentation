@@ -9,7 +9,7 @@ namespace App.Autofac
         {
             var f = new LoggerFactory()
                 .AddDebug();
-            
+
             builder.RegisterInstance(f.CreateLogger("default"))
                 .As<ILogger>()
                 .SingleInstance();

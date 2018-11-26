@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using App.Models;
 using AutoMapper;
@@ -19,14 +17,14 @@ namespace App.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class NewDicomController : ControllerBase
-    {        
-        private readonly IDicomSliceRepository _dicomSliceRepository;
-        private readonly IMapper _mapper;
-        private readonly ILogger _logger;
-        private readonly IVolumeCalculator _volumeCalculator;
-        private readonly IDicomModelRepository _dicomModelRepository;
-        private readonly IPatientRepository _patientRepository;
+    {
         private readonly IDicomConverter _dicomConverter;
+        private readonly IDicomModelRepository _dicomModelRepository;
+        private readonly IDicomSliceRepository _dicomSliceRepository;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
+        private readonly IPatientRepository _patientRepository;
+        private readonly IVolumeCalculator _volumeCalculator;
 
         public NewDicomController(IDicomSliceRepository dicomSliceRepository, IMapper mapper, ILogger logger,
             IVolumeCalculator volumeCalculator, IDicomModelRepository dicomModelRepository,
@@ -45,13 +43,11 @@ namespace App.Controllers
         ///     Upload DICOM, and calculate it's mask, creates new DicomEntry
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
+        ///     Sample request:
         ///     POST /api/NewDicom
         ///     {
-        ///        "base64Dicom": "",
+        ///     "base64Dicom": "",
         ///     }
-        ///
         /// </remarks>
         /// <param name="newDicom">New dicom file as base64 encoded string</param>
         /// <returns>generated DicomModelId</returns>
@@ -61,7 +57,7 @@ namespace App.Controllers
             var mask = await GetSegmentation(newDicom.Base64Dicom);
 
             var dicom = _dicomConverter.OpenDicomAndConvertToModel(newDicom.Base64Dicom);
-            
+
             var volume = await CalculateVolume(mask, dicom);
 
             var newPatient = InsertNewPatient(dicom, volume);
@@ -76,7 +72,7 @@ namespace App.Controllers
 
             _dicomModelRepository.InsertDicom(newPatient);
             _dicomModelRepository.Save();
-            
+
             var newPatientData = _mapper.Map<DicomPatientData>(dicom.DicomPatientData);
             newPatientData.DicomModelId = newPatient.DicomModelId;
             newPatientData.ProstateVolume = volume;
@@ -97,7 +93,7 @@ namespace App.Controllers
 
         private async Task<double> CalculateVolume(IEnumerable<byte[]> mask, NewDicomInputModel dicom)
         {
-            var dataModel = new VolumeDataModel()
+            var dataModel = new VolumeDataModel
             {
                 Masks = mask,
                 distanceBetweenSlicesmm = dicom.SpacingBetweenSlices,

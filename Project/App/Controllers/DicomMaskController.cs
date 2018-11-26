@@ -13,13 +13,13 @@ namespace App.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class DicomMaskController : ControllerBase
-    {        
-        private readonly IDicomSliceRepository _repository;
-        private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+    {
         private readonly IVolumeCalculator _calculator;
         private readonly IDicomModelRepository _dicomModelRepository;
+        private readonly ILogger _logger;
+        private readonly IMapper _mapper;
         private readonly IPatientRepository _patientRepository;
+        private readonly IDicomSliceRepository _repository;
 
         public DicomMaskController(IDicomSliceRepository repository, IMapper mapper, ILogger logger,
             IVolumeCalculator calculator, IDicomModelRepository dicomModelRepository,
@@ -32,23 +32,22 @@ namespace App.Controllers
             _dicomModelRepository = dicomModelRepository;
             _patientRepository = patientRepository;
         }
+
         /// <summary>
         ///     Get mask for DICOM slice
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
+        ///     Sample request:
         ///     GET /api/DicomMask
         ///     {
-        ///        "PatientId.PatientId": 1,
-        ///        "SliceIndex": 1
+        ///     "PatientId.PatientId": 1,
+        ///     "SliceIndex": 1
         ///     }
-        ///
         /// </remarks>
         /// <param name="patientId">PatientId's of DICOM and slice</param>
         /// <returns>returns DicomSliceModel representing mask object</returns>
         [HttpGet]
-        public DicomSliceModel GetImage([FromQuery]SliceModelId patientId)
+        public DicomSliceModel GetImage([FromQuery] SliceModelId patientId)
         {
             var image = _repository.GetMaskById(patientId.PatientId.Id, patientId.SliceIndex);
             if (image == null)
@@ -56,28 +55,26 @@ namespace App.Controllers
                 Response.StatusCode = 404;
                 return null;
             }
-            
-           return new DicomSliceModel(image);
+
+            return new DicomSliceModel(image);
         }
 
         /// <summary>
         ///     Uploads new mask for DICOM slice
         /// </summary>
         /// <remarks>
-        /// Sample request:
-        ///
+        ///     Sample request:
         ///     POST /api/DicomMask
         ///     {
-        ///         "sliceModelId": {
-        ///             "patientId": {
-        ///                 "id": 0
-        ///             },
-        ///             "sliceIndex": 0
-        ///         },
-        ///         "newMask": "string"
+        ///     "sliceModelId": {
+        ///     "patientId": {
+        ///     "id": 0
+        ///     },
+        ///     "sliceIndex": 0
+        ///     },
+        ///     "newMask": "string"
         ///     }
-        ///
-        /// null value passed as 
+        ///     null value passed as
         /// </remarks>
         /// <param name="maskModel">New mask</param>
         /// <returns></returns>
@@ -104,7 +101,7 @@ namespace App.Controllers
         {
             var images = _repository.GetMasks(patientId);
             var dicomModel = _dicomModelRepository.GetDicomModelById(patientId);
-            var dataModel = new VolumeDataModel()
+            var dataModel = new VolumeDataModel
             {
                 Masks = images,
                 distanceBetweenSlicesmm = dicomModel.SpacingBetweenSlices,
