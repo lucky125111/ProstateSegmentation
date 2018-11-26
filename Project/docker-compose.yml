@@ -6,7 +6,9 @@ services:
     image: ${DOCKER_REGISTRY}app
     build:
       context: .
-      dockerfile: App/Dockerfile
+      dockerfile: App/Dockerfile    
+    ports:
+      - "5001:80"
     depends_on:
       - db
   db:
@@ -15,5 +17,6 @@ services:
     environment:
         SA_PASSWORD: "sUper45!pas5word"
         ACCEPT_EULA: "Y"
+    restart: "always"
     ports:
       - "1184:1433"

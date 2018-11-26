@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Core.Context;
 using Core.Dicom;
@@ -17,10 +19,14 @@ namespace Core
 
             var dcmConverter = new DicomConverter();
 
+            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedData");
+
+            Console.WriteLine(string.Join(",", Directory.GetFiles(dataPath).Select(x => x)));
+
             var d1 = dcmConverter.OpenDicomAndConvertFromFile(
-                @"D:\Inzynierka\src\Data\CT.rtp1.12.20080627A.CHESTPHANTOM.T.-.3.CT.dcm");
+               Path.Combine(dataPath, @"CT.rtp1.12.20080627A.CHESTPHANTOM.T.-.3.CT.dcm"));
             var d2 = dcmConverter.OpenDicomAndConvertFromFile(
-                @"D:\Inzynierka\src\Data\DOSE.20080627A.TRAINING4FLD.dcm");
+                Path.Combine(dataPath, @"DOSE.20080627A.TRAINING4FLD.dcm"));
 
             var e1 = new DicomModel
             {
