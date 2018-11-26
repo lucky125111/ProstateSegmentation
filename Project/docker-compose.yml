@@ -12,8 +12,6 @@ services:
   db:
     container_name: mssql
     image: "mcr.microsoft.com/mssql/server:2017-latest"
-    volumes:
-       - ./data/mssql:/var/opt/mssql
     environment:
         SA_PASSWORD: "sUper45!pas5word"
         ACCEPT_EULA: "Y"

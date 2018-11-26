@@ -23,7 +23,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>8c154c68-b6a5-4418-8969-0bda93bb3303</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/api/values</DockerServiceUrl>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>app</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
