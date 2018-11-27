@@ -21,8 +21,6 @@ namespace Core
 
             var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedData");
 
-            Console.WriteLine(string.Join(",", Directory.GetFiles(dataPath).Select(x => x)));
-
             var d1 = dcmConverter.OpenDicomAndConvertFromFile(
                Path.Combine(dataPath, @"CT.rtp1.12.20080627A.CHESTPHANTOM.T.-.3.CT.dcm"));
             var d2 = dcmConverter.OpenDicomAndConvertFromFile(

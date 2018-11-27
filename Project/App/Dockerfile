@@ -7,7 +7,6 @@ WORKDIR /src
 COPY App/App.csproj App/
 RUN dotnet restore App/App.csproj
 COPY . .
-RUN ls -la .
 WORKDIR /src/App
 RUN dotnet build App.csproj -c Release -o /app
 
@@ -17,5 +16,4 @@ RUN dotnet publish App.csproj -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-RUN ls -a 
 ENTRYPOINT ["dotnet", "App.dll"]
