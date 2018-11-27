@@ -25,6 +25,13 @@
     <ProjectReference Include="..\Volume\Volume.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="SeedData\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
