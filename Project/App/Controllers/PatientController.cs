@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class PatientController : ControllerBase
     {
         private readonly ILogger _logger;
