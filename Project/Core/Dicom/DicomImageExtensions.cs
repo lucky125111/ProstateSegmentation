@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Dicom.Imaging;
@@ -14,10 +15,21 @@ namespace Core.Dicom
             return dcm.RenderImage(frame).AsBytes();
         }
 
-        public static Bitmap RenderAsBitmap(this DicomImage dcm, int frame = 0)
+        public static Bitmap ToBitmap(this DicomImage dcm, int frame = 0)
         {
             var x = dcm.ToBytes(frame);
             return x.RenderBitmap(dcm.Width, dcm.Height);
+        }
+
+        public static byte[] ToBytesPng(this Bitmap bitmap)
+        {
+            byte[] result = null;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                bitmap.Save(stream, ImageFormat.Png);
+                result = stream.ToArray();
+            } 
+            return result;
         }
 
         public static Bitmap RenderBitmap(this byte[] bytes, int dcmWidth, int dcmHeight)
@@ -30,7 +42,18 @@ namespace Core.Dicom
             return bitmap;
         }
 
-        public static byte[] ToBytes(this Bitmap image)
+        public static Bitmap RenderBitmap(this byte[] bytes)
+        {
+            Bitmap bmp;
+            using (var ms = new MemoryStream(bytes))
+            {
+                bmp = new Bitmap(ms);
+            }
+
+            return bmp;
+        }
+
+        public static byte[] ToBytesMarshall(this Bitmap image)
         {
             var bmpdata = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly,
                 image.PixelFormat);

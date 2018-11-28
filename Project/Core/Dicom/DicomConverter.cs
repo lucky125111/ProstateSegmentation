@@ -113,11 +113,11 @@ namespace Core.Dicom
             return list;
         }
 
-        private static List<byte[]> GetImagesAsByteList(DicomImage dcm)
+        public static List<byte[]> GetImagesAsByteList(DicomImage dcm)
         {
             var l = new List<byte[]>();
 
-            for (var i = 0; i < dcm.NumberOfFrames; i++) l.Add(dcm.ToBytes(i));
+            for (var i = 0; i < dcm.NumberOfFrames; i++) l.Add(dcm.ToBytes(i).RenderBitmap(dcm.Width, dcm.Height).ToBytesPng());
 
             return l;
         }
