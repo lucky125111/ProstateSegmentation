@@ -1,9 +1,11 @@
 using System;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Core.Dicom;
 using Dicom;
+using Dicom.Imaging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -59,10 +61,27 @@ namespace App.Tests
             var x = c.OpenDicomAndConvertFromFile(path);
 
             var b = x.DicomSlices.First().Image.RenderBitmap(x.ImageWidth, x.ImageHeight);
+            
+            byte[] result = null;
 
-            b.Save("obraz.bmp");
+            b.Save("obraz.png", ImageFormat.Png);
         }
+        //
+        [Fact]
+        public void GenerateImageFromDicom()
+        {
+            var path = Directory.GetFiles(_prostate000Path).First();
+            
+            var dcm = DicomFile.Open(path);
 
+            var images = new DicomImage(dcm.Dataset);
+            var imageList = DicomConverter.GetImagesAsByteList(images);
+
+            for (int i = 0; i < imageList.Count; i++)
+            {
+                imageList[i].RenderBitmap().Save("obraz"+i+".png", ImageFormat.Png);
+            }
+        }
         [Fact]
         public void GetDicomDetails()
         {

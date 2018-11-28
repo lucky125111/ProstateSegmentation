@@ -6,6 +6,7 @@ using AutoMapper;
 using Core.Dicom;
 using Core.Entity;
 using Core.Model;
+using Core.Model.DicomInput;
 using Core.Model.NewDicom;
 using Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -57,19 +58,17 @@ namespace App.Controllers
             var mask = await GetSegmentation(newDicom.Base64Dicom);
 
             var dicom = _dicomConverter.OpenDicomAndConvertToModel(newDicom.Base64Dicom);
-
+            
             var volume = await CalculateVolume(mask, dicom);
 
             var newPatient = InsertNewPatient(dicom, volume);
 
             return new PatientId(newPatient.DicomModelId);
         }
-
         private DicomModel InsertNewPatient(NewDicomInputModel dicom, double volume)
         {
             var newPatient = _mapper.Map<DicomModel>(dicom);
-
-
+            
             _dicomModelRepository.InsertDicom(newPatient);
             _dicomModelRepository.Save();
 
@@ -82,13 +81,23 @@ namespace App.Controllers
                 var dicomSlice = _mapper.Map<DicomSlice>(x);
                 dicomSlice.DicomModelId = newPatient.DicomModelId;
                 return dicomSlice;
-            });
+            }).ToList();
+
+            foreach (var dicomSlice in slices)
+            {
+                dicomSlice.Mask = GetMask(dicomSlice.Image);
+            }
 
             _patientRepository.InsertPatientData(newPatientData);
             _dicomSliceRepository.InsertSlices(slices);
             _dicomSliceRepository.Save();
 
             return newPatient;
+        }
+
+        private byte[] GetMask(byte[] dicomSlice)
+        {
+            throw new System.NotImplementedException();
         }
 
         private async Task<double> CalculateVolume(IEnumerable<byte[]> mask, NewDicomInputModel dicom)
