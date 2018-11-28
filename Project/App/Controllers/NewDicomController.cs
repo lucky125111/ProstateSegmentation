@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using App.Models;
 using AutoMapper;
@@ -11,6 +13,8 @@ using Core.Model.NewDicom;
 using Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RestSharp;
+using RestSharp.Deserializers;
 using Volume;
 
 namespace App.Controllers
@@ -97,7 +101,22 @@ namespace App.Controllers
 
         private byte[] GetMask(byte[] dicomSlice)
         {
-            throw new System.NotImplementedException();
+            var sliceBase64 = Convert.ToBase64String(dicomSlice);
+            var client = new RestClient("http://localhost:5000/predict_mask/");
+            var request = new RestRequest(Method.POST);
+            request.AddParameter("application/json", "{\"image\": \""+sliceBase64+"\"}", ParameterType.RequestBody);
+            var response = client.Execute(request);
+            
+            Console.WriteLine(response);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var maskBase64 = new JsonDeserializer().Deserialize<string>(response);
+                return Convert.FromBase64String(maskBase64);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private async Task<double> CalculateVolume(IEnumerable<byte[]> mask, NewDicomInputModel dicom)
