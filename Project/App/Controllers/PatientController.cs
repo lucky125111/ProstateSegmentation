@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
-    public class PatientController : Controller
+    public class PatientController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
