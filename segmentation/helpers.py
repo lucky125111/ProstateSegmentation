@@ -68,8 +68,8 @@ def convert_np_mask_to_image(np_predicted_mask, width, height):
 
 
 def predict_mask(np_image):
-
-    width, height = np_image.shape
+    # print(np_image)
+    width, height, channels = np_image.shape
     normalized_img = normalize_np_image(np_image)
 
     # Expanding dims to match expected by model
