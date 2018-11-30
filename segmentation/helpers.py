@@ -7,6 +7,7 @@ import PIL.ImageOps
 
 import scipy.ndimage
 from keras.optimizers import Adam
+from keras import backend as K
 
 from skimage.exposure import equalize_hist
 from skimage.transform import resize
@@ -22,7 +23,7 @@ WEIGHTS_FILE = 'weights.h5'
 
 
 def convert_base64_to_image(data):
-    return Image.open(BytesIO(base64.b64decode(data)))
+    return Image.open(BytesIO(base64.b64decode(data))).convert('L')
 
 
 def convert_image_to_base64(image):
@@ -68,8 +69,9 @@ def convert_np_mask_to_image(np_predicted_mask, width, height):
 
 
 def predict_mask(np_image):
+    K.clear_session()
     # print(np_image)
-    width, height, channels = np_image.shape
+    width, height = np_image.shape
     normalized_img = normalize_np_image(np_image)
 
     # Expanding dims to match expected by model
