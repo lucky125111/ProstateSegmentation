@@ -1,0 +1,9 @@
+
+input[type=file] {
+    width: inherit;
+}
+  
+  .form-control {
+    display:inline-block;
+    width: inherit;
+  }

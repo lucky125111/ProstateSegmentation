@@ -19,12 +19,11 @@ app = Flask(__name__)
 def predict_base64_mask():
     if request.method == 'POST':
         base64_image = request.get_json()['image']
-
         np_image = np.array(convert_base64_to_image(base64_image))
-        print(np_image)
         base64_predicted_mask = predict_mask(np_image)
         return jsonify({'mask': base64_predicted_mask})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
+
 
