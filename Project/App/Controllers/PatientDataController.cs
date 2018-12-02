@@ -22,29 +22,29 @@ namespace App.Controllers
             return patients;
         }
 
-        [HttpGet("{id}")]
-        public PatientDataModel Get(int id)
+        [HttpGet("{dicomId}")]
+        public PatientDataModel Get(int dicomId)
         {
-            var patient = _patientService.GetPatient(id);
+            var patient = _patientService.GetPatient(dicomId);
             return patient;
         }
 
-        [HttpPost]
-        public void Post([FromBody] PatientDataModel value)
+        [HttpPost("{dicomId}")]
+        public void Post(int dicomId, [FromBody] PatientDataModel value)
         {
-            _patientService.UploadPatient(value);
+            _patientService.UploadPatient(dicomId, value);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] PatientDataModel value)
+        [HttpPut("{dicomId}")]
+        public void Put(int dicomId, [FromBody] PatientDataModel value)
         {
-            _patientService.UpdatePatient(id, value);
+            _patientService.UpdatePatient(dicomId, value);
         }
 
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{dicomId}")]
+        public void Delete(int dicomId)
         {
-            _patientService.DeletePatient(id);
+            _patientService.DeletePatient(dicomId);
         }
     }
 }

@@ -32,6 +32,8 @@ namespace Application.Services
         public DicomModel GetDicomById(int id)
         {
             var dto = _dicomContext.DicomModels.Find(id);
+            if(dto == null)
+                throw new AppException($"Dicom {id} was not found");
             return _mapper.Map<DicomModel>(dto);
         }
 
@@ -50,8 +52,8 @@ namespace Application.Services
             var update = _dicomContext.DicomModels.Find(id);
             
             if(update == null)
-                return;
-            
+                throw new AppException($"Dicom {id} was not found");
+
             _dicomContext.Entry(update).CurrentValues.SetValues(dto);
             _dicomContext.SaveChanges();
         }
@@ -59,12 +61,24 @@ namespace Application.Services
         public void DeleteDicom(int id)
         {
             if(_dicomContext.DicomSlices.Any(x => x.DicomModelId == id) || _dicomContext.DicomPatientDatas.Any(x => x.DicomModelId == id))
-                return;
+                throw new AppException($"Cannot remove dicom {id} because it has dependencies");;
 
             var dto = _dicomContext.DicomModels.Find(id);
+            
+            if(dto == null)
+                throw new AppException($"Dicom {id} was not found");
 
             _dicomContext.DicomModels.Remove(dto);
             _dicomContext.SaveChanges();
+        }
+
+        public IEnumerable<int> GetImageIndexes(int id)
+        {
+            if(!_dicomContext.DicomSlices.Any(x => x.DicomModelId == id))
+                throw new AppException($"No images found for dicom {id}");
+
+            var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == id).Select(x => x.InstanceNumber);
+            return dto;
         }
 
         public void Dispose()

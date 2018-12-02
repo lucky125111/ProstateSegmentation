@@ -43,5 +43,11 @@ namespace App.Controllers
         {
             _segmentationService.Calculate(dicomId, sliceId);
         }
+        
+        [HttpDelete("{dicomId}&{sliceId}")]
+        public void Delete(int dicomId, int sliceId)
+        {
+            _maskService.RemoveMask(dicomId, sliceId);
+        }
     }
 }

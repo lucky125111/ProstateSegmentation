@@ -2,11 +2,10 @@
 using Application.Data.Context;
 using Application.Data.Entity;
 using Application.Models;
+using Application.Services;
 using AutoFixture;
-using Dicom.Network;
 using FluentAssertions;
 using Xunit;
-using DicomService = Application.Services.DicomService;
 
 namespace Application.Tests
 {
@@ -26,8 +25,6 @@ namespace Application.Tests
         [Fact]
         public void GetAllDicomsTest()
         {
-            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
-
             var i = _fixture.Build<DicomModelEntity>()
                 .Without(p => p.DicomModelId)
                 .Without(p => p.DicomImages)
@@ -47,10 +44,15 @@ namespace Application.Tests
         }
 
         [Fact]
+        public void GetAllDicoms_ShouldBeEmptyTest()
+        {
+            var d = _dicomService.GetAllDicoms().ToList();
+            d.Should().BeNullOrEmpty();
+        }
+
+        [Fact]
         public void GetDicomByIdTest()
         {
-            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
-
             var i = _fixture.Build<DicomModelEntity>()
                 .Without(p => p.DicomModelId)
                 .Without(p => p.DicomImages)
@@ -69,10 +71,15 @@ namespace Application.Tests
         }
 
         [Fact]
+        public void GetDicomById_ShouldBeNullTest()
+        {
+            var d = _dicomService.GetDicomById(-1);
+            d.Should().BeNull();
+        }
+
+        [Fact]
         public void AddDicomTest()
         {
-            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
-
             var i = _fixture.Build<DicomModel>()
                 .With(p => p.DicomModelId, 0)
                 .Create();
@@ -91,8 +98,6 @@ namespace Application.Tests
         [Fact]
         public void UpdateDicomTest()
         {
-            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
-
             var i = _fixture.Build<DicomModelEntity>()
                 .Without(p => p.DicomModelId)
                 .Without(p => p.DicomImages)
@@ -103,7 +108,7 @@ namespace Application.Tests
             _dicomContext.SaveChanges();
 
             i.NumberOfImages = 5;
-
+            
             _dicomService.UpdateDicom(i.DicomModelId, _mapper.Map<DicomModel>(i));
             
             var d = _dicomContext.DicomModels.Find(i.DicomModelId);
@@ -118,8 +123,6 @@ namespace Application.Tests
         [Fact]
         public void DeleteDicomTest()
         {
-            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
-
             var i = _fixture.Build<DicomModelEntity>()
                 .Without(p => p.DicomModelId)
                 .Without(p => p.DicomImages)
@@ -132,6 +135,34 @@ namespace Application.Tests
             _dicomService.DeleteDicom(i.DicomModelId);
 
             _dicomContext.DicomModels.Find(i.DicomModelId).Should().BeNull();
+        }
+
+        [Fact]
+        public void DeleteDicom_ShouldNotRemoveTest()
+        {
+            var i = _fixture.Build<DicomModelEntity>()
+                .Without(p => p.DicomModelId)
+                .Without(p => p.DicomImages)
+                .Without(p => p.DicomPatientDataEntity)
+                .Create();
+
+            _dicomContext.DicomModels.Add(i);
+
+            var s = _fixture.Build<DicomSliceEntity>()
+                .With(p => p.DicomModelId, i.DicomModelId)
+                .Without(p => p.DicomModelEntity)
+                .Create();
+            
+            _dicomContext.DicomSlices.Add(s);
+            _dicomContext.SaveChanges();
+
+            _dicomService.DeleteDicom(i.DicomModelId);
+
+            _dicomContext.DicomModels.Find(i.DicomModelId).Should().NotBeNull();
+            
+            _dicomContext.DicomModels.RemoveRange(_dicomContext.DicomModels);
+            _dicomContext.DicomSlices.RemoveRange(_dicomContext.DicomSlices);
+            _dicomContext.SaveChanges();
         }
     }
 }

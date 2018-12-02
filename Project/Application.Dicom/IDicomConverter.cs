@@ -4,7 +4,8 @@ namespace Application.Dicom
 {
     public interface IDicomConverter
     {
-        NewDicomModel OpenDicomAndConvertFromFile(string combine);
-        NewDicomModel OpenDicomAndConvertFromByte(byte[] combine);
+        NewDicomModel OpenDicomAndConvertFromFile(string path);
+        NewDicomModel OpenDicomAndConvertFromByte(byte[] dicomBytes);
+        NewDicomModel OpenDicomAndConvertFromBase64(string base64Dicom);
     }
 }

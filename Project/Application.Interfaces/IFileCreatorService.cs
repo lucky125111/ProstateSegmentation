@@ -1,8 +1,9 @@
-﻿using Application.Models;
+﻿using System;
+using Application.Models;
 
 namespace Application.Interfaces
 {
-    public interface IFileCreatorService
+    public interface IFileCreatorService : IDisposable
     {
         DicomFile CreateDicom(int id);
     }

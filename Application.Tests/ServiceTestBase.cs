@@ -1,4 +1,5 @@
-﻿using Application.Automapper;
+﻿using System;
+using Application.Automapper;
 using Application.Data.Context;
 using AutoFixture;
 using AutoMapper;

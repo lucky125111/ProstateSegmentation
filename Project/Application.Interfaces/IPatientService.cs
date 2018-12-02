@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Application.Models;
 
 namespace Application.Interfaces
 {
-    public interface IPatientService
+    public interface IPatientService : IDisposable
     {
         IEnumerable<PatientDataModel> GetPatients();
         PatientDataModel GetPatient(int id);
-        void UploadPatient(PatientDataModel value);
+        int UploadPatient(int id, PatientDataModel value);
         void UpdatePatient(int id, PatientDataModel value);
         void DeletePatient(int id);
     }

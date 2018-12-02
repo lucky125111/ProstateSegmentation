@@ -35,5 +35,11 @@ namespace App.Controllers
         {
             _imageService.UdateImage(dicomId, sliceId, value);
         }
+
+        [HttpDelete("{dicomId}&{sliceId}")]
+        public void Delete(int dicomId, int sliceId)
+        {
+            _imageService.RemoveImage(dicomId, sliceId);
+        }
     }
 }

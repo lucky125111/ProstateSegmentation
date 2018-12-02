@@ -13,6 +13,6 @@ namespace Application.Dicom.DicomModels
         public double? SpacingBetweenSlices { get; set; }
 
         public NewDicomPatientData DicomPatientData { get; set; }
-        public NewDicomSlice DicomSlices { get; }
+        public NewDicomSlice DicomSlices { get; set; }
     }
 }

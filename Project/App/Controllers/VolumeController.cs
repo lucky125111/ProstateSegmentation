@@ -14,7 +14,7 @@ namespace App.Controllers
             _volumeService = volumeService;
         }
         
-        [HttpGet("Recalculate/{id}")]
+        [HttpGet("Calculate/{id}")]
         public double Recalculate(int dicomId)
         {
             var volume = _volumeService.CalculateVolume(dicomId);

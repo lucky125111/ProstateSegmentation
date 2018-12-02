@@ -34,23 +34,33 @@ namespace Application.Services
             return _mapper.Map<SliceModel>(dto);
         }
 
-        public void AddNewSlice(int id, SliceModel value)
+        public int AddNewSlice(int id, SliceModel value)
         {
             var dto = _mapper.Map<DicomSliceEntity>(value);
             _dicomContext.DicomSlices.Add(dto);
             _dicomContext.SaveChanges();
+            return dto.InstanceNumber;
         }
 
         public void UpdateSlice(int dicomId, int sliceId, SliceModel value)
         {            
             var dto = _mapper.Map<DicomSliceEntity>(value);
+            dto.DicomModelId = dicomId;
+            dto.InstanceNumber = sliceId;
+
             var update = _dicomContext.DicomSlices.Find(dicomId, sliceId);
             
             if(update == null)
                 return;
             
-            update = dto;
-            _dicomContext.DicomSlices.Update(update);
+            _dicomContext.Entry(update).CurrentValues.SetValues(dto);
+            _dicomContext.SaveChanges();
+        }
+
+        public void RemoveImage(int dicomId, int sliceId)
+        {            
+            var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
+            _dicomContext.DicomSlices.Remove(dto);
             _dicomContext.SaveChanges();
         }
 

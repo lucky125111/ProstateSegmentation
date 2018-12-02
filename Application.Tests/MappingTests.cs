@@ -11,9 +11,6 @@ namespace Application.Tests
 {
     public class MappingTests : ServiceTestBase
     {
-        private Fixture _fixture;
-        private IMapper _mapper;
-
         public MappingTests()
         {
             _fixture = new Fixture();

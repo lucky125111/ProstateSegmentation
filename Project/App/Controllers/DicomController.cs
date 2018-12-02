@@ -32,7 +32,14 @@ namespace App.Controllers
             return dicomModel;
         }
 
-        [HttpGet("Base64Dicom/{id}")]
+        [HttpGet("Indexes/{id}")]
+        public IEnumerable<int> GetIndexes(int id)
+        {
+            var dicomModel = _dicomService.GetImageIndexes(id);
+            return dicomModel;
+        }
+
+        [HttpGet("File/{id}")]
         public DicomFile CreateDicom(int id)
         {
             var dicomModel = _creatorService.CreateDicom(id);

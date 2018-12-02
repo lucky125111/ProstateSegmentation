@@ -25,20 +25,30 @@ namespace Application.Services
         public IEnumerable<ImageModel> GetAllImages(int dicomId)
         {
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId);
+            
+            if(dto == null)
+                throw new AppException($"No image for dicom {dicomId} were not found");
+
             return dto.Select(x => _mapper.Map<ImageModel>(x));
         }
 
         public ImageModel GetImage(int dicomId, int sliceId)
         {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
+            
+            if(dto == null)
+                throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
+
             return _mapper.Map<ImageModel>(dto);
         }
 
-        public void AddImage(int dicomId, ImageModel value)
+        public int AddImage(int dicomId, ImageModel value)
         {
             var dto = _mapper.Map<DicomSliceEntity>(value);
+            dto.DicomModelId = dicomId;
             _dicomContext.DicomSlices.Add(dto);
             _dicomContext.SaveChanges();
+            return dto.InstanceNumber;
         }
 
         public void UdateImage(int dicomId, int sliceId, ImageModel value)
@@ -46,18 +56,22 @@ namespace Application.Services
             var update = _dicomContext.DicomSlices.Find(dicomId, sliceId);
             
             if(update == null)
-                return;
-            
+                throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
+
             update.Image = value.Image;
-            _dicomContext.DicomSlices.Update(update);
+            _dicomContext.Entry(update).Property(p => p.Image).IsModified = true;
             _dicomContext.SaveChanges();
         }
 
         public void RemoveImage(int dicomId, int sliceId)
         {            
-            var dto = _dicomContext.DicomModels.Find(dicomId, sliceId);
+            var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
+            
+            if(dto == null)
+                throw new AppException($"No patient data for dicom {dicomId}, slice {sliceId} is present");
 
-            _dicomContext.DicomModels.Remove(dto);
+            dto.Image = null;
+            _dicomContext.Entry(dto).Property(p => p.Image).IsModified = true;
             _dicomContext.SaveChanges();
         }
         

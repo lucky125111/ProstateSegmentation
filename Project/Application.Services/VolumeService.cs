@@ -42,6 +42,7 @@ namespace Application.Services
 
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation)
         {            
+            //todo
             return 0;
         }
 
