@@ -1,8 +1,5 @@
-﻿using App.Models;
-using AutoMapper;
-using Core.Repositories;
+﻿using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace App.Controllers
 {
@@ -10,34 +7,25 @@ namespace App.Controllers
     [ApiController]
     public class VolumeController : ControllerBase
     {
-        private readonly ILogger _logger;
-        private readonly IMapper _mapper;
-        private readonly IPatientRepository _repository;
+        private readonly IVolumeService _volumeService;
 
-        public VolumeController(IPatientRepository repository, IMapper mapper, ILogger logger)
+        public VolumeController(IVolumeService volumeService)
         {
-            _repository = repository;
-            _mapper = mapper;
-            _logger = logger;
+            _volumeService = volumeService;
+        }
+        
+        [HttpGet("Calculate/{id}")]
+        public double Recalculate(int dicomId)
+        {
+            var volume = _volumeService.CalculateVolume(dicomId);
+            return volume;
         }
 
-        /// <summary>
-        ///     Gets volume of prostate mask
-        /// </summary>
-        /// <remarks>
-        ///     Sample request:
-        ///     POST /api/VolumeVolume
-        ///     {
-        ///     "id": 1,
-        ///     }
-        /// </remarks>
-        /// <param name="patientId">Patient PatientId</param>
-        /// <returns>Calculated volume</returns>
-        [HttpGet]
-        public VolumeModel GetVolume([FromQuery] PatientId patientId)
+        [HttpGet("{id}")]
+        public double Get(int dicomId)
         {
-            var patient = _repository.GetPatientById(patientId.Id);
-            return _mapper.Map<VolumeModel>(patient);
+            var volume = _volumeService.GetVolume(dicomId);
+            return volume;
         }
     }
 }

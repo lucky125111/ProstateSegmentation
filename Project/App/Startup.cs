@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using App.Autofac;
+using Application.Autofac;
+using Application.Data.Context;
 using Autofac;
-using Core.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +53,6 @@ namespace App
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule(new LoggerModule());
             builder.RegisterModule(new MapperModule());
             builder.RegisterModule(new AppModule());
 
