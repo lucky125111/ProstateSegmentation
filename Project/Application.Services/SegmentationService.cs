@@ -31,13 +31,18 @@ namespace Application.Services
         public byte[] Calculate(byte[] image)
         {
             var sliceBase64 = Convert.ToBase64String(image);
-            var client = new RestClient("http://localhost:5000/predict_mask/");
+            var client = new RestClient("http://web:5000/predict_mask/");
             var request = new RestRequest(Method.POST);
+            request.AddHeader("content-type", "application/json");
             request.AddParameter("application/json", "{\"image\": \"" + sliceBase64 + "\"}", ParameterType.RequestBody);
             var response = client.Execute(request);
-            
+            Console.WriteLine("RESPONSE");
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content);
+            Console.WriteLine(response.StatusCode);
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                Console.WriteLine("RESPONSE WAS SUCCESSFUL");
                 var maskBase64 = JsonConvert.DeserializeObject<SegmentationResult>(response.Content);
                 return Convert.FromBase64String(maskBase64.mask);
             }

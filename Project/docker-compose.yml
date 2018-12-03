@@ -11,6 +11,11 @@ services:
       - "5001:80"
     depends_on:
       - db
+  web:
+    build: segmentation
+    ports: 
+      - "5000:5000"
+
   db:
     container_name: mssql
     image: "mcr.microsoft.com/mssql/server:2017-latest"
@@ -20,3 +25,4 @@ services:
     restart: "always"
     ports:
       - "1184:1433"
+ 
