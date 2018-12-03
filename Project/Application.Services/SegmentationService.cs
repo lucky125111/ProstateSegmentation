@@ -3,6 +3,7 @@ using System.Net;
 using Application.Data.Context;
 using Application.Interfaces;
 using AutoMapper;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Deserializers;
 
@@ -23,22 +24,23 @@ namespace Application.Services
 
         public byte[] Calculate(int dicomId, int sliceId)
         {
-            var image = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            return Calculate(image.Image);
+            //var image = _dicomContext.DicomSlices.Find(dicomId, sliceId);
+            //return Calculate(image.Image);
+            return Calculate(null);
         }
 
         public byte[] Calculate(byte[] image)
-        {            
+        {
             var sliceBase64 = Convert.ToBase64String(image);
             var client = new RestClient("http://localhost:5000/predict_mask/");
             var request = new RestRequest(Method.POST);
-            request.AddParameter("application/json", "{\"image\": \""+sliceBase64+"\"}", ParameterType.RequestBody);
+            request.AddParameter("application/json", "{\"image\": \"" + sliceBase64 + "\"}", ParameterType.RequestBody);
             var response = client.Execute(request);
             
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                var maskBase64 = new JsonDeserializer().Deserialize<string>(response);
-                return Convert.FromBase64String(maskBase64);
+                var maskBase64 = JsonConvert.DeserializeObject<SegmentationResult>(response.Content);
+                return Convert.FromBase64String(maskBase64.mask);
             }
 
             return null;
@@ -56,6 +58,11 @@ namespace Application.Services
                 if (disposing)
                     _dicomContext.Dispose();
             _disposed = true;
+        }
+
+        private class SegmentationResult
+        {
+            public string mask { get; set; }
         }
     }
 }
