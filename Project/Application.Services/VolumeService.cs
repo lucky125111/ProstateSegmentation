@@ -31,7 +31,7 @@ namespace Application.Services
             return dicomModelEntity.ProstateVolume;
         }
 
-        public double CalculateVolume(int dicomId)
+        public double CalculateVolume(int dicomId, string type)
         {
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId);
             var masks = dto.Select(x => x.Mask);
@@ -40,12 +40,12 @@ namespace Application.Services
 
             var imageInformation = _mapper.Map<ImageInformation>(dicomModelEntity);
 
-            return CalculateVolume(masks, imageInformation);
+            return CalculateVolume(masks, imageInformation, type);
         }
 
-        public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation)
+        public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation, string type)
         {
-            var client = new RestClient("http://localhost:5000/predict_mask/");
+            var client = new RestClient($"http://volume:5002/api/Volume/{type}");
             var request = new RestRequest(Method.POST);
             var requestObject = new VolumeRequest()
             {
@@ -54,7 +54,11 @@ namespace Application.Services
             };
             var json = JsonConvert.SerializeObject(requestObject);
             request.AddParameter("application/json", json, ParameterType.RequestBody);
+
+            Console.WriteLine(request);
             var response = client.Execute(request);
+            Console.WriteLine(response);
+            Console.WriteLine(response.StatusCode);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

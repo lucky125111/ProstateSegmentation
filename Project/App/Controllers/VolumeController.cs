@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
@@ -14,11 +15,16 @@ namespace App.Controllers
             _volumeService = volumeService;
         }
         
-        [HttpGet("Calculate/{id}")]
-        public double Recalculate(int dicomId)
+        [HttpPost("Calculate/{id}&{type}")]
+        public void Recalculate(int id, string type)
         {
-            var volume = _volumeService.CalculateVolume(dicomId);
-            return volume;
+            if(type != null && type != "Simple" && type != "ConvexHull")
+                throw new AppException("type value can be either \"Simple\" or \"ConvexHull\"");
+
+            if (type == null)
+                type = "ConvexHull";
+
+            _volumeService.CalculateVolume(id, type);
         }
 
         [HttpGet("{id}")]
