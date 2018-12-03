@@ -20,3 +20,11 @@ services:
     restart: "always"
     ports:
       - "1184:1433"
+  volume:
+    container_name: volume
+    image: ${DOCKER_REGISTRY}volume
+    build:
+      context: .
+      dockerfile: VolumeService/Dockerfile    
+    ports:
+      - "5002:80"
