@@ -10,7 +10,7 @@ import Panel from "./containers/Panel";
 export default ({ childProps }) =>
   <Switch>
     <AppliedRoute path="/" exact component={Panel} props={childProps} />
-    <AppliedRoute path={`/patient/:patientID`} component={ImageEditor} />
+    <AppliedRoute path={`/patient/:patientId`} component={ImageEditor} />
     { /* Finally, catch all unmatched routes */ }
     <Route component={NotFound} />
   </Switch>;

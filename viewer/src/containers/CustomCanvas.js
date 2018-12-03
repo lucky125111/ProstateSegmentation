@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import axios from 'axios';
 import { findDOMNode } from 'react-dom'
 
 import { Pencil, TOOL_PENCIL, Rubber, TOOL_RUBBER } from './tools'
@@ -46,11 +47,19 @@ export default class CustomCanvas extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            styles: {
+                position: "absolute",
+                top: 0,
+                left: 0
+            }
+        };
         this.initTool = this.initTool.bind(this);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onDebouncedMove = this.onDebouncedMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
+        this.updateMask = this.updateMask.bind(this);
     }
 
     componentDidMount() {
@@ -58,36 +67,40 @@ export default class CustomCanvas extends Component {
         this.backgroundCtx = this.backgroundCanvas.getContext('2d');
         this.canvas = findDOMNode(this.foregroundCanvasRef);
         this.ctx = this.canvas.getContext('2d');
+
         var foregroundCtx = this.ctx;
         var local_canvas = this.canvas;
 
-        var backgroundImage = new Image;
+        // var backgroundImage = new Image;
 
         var backgroundCtx = this.backgroundCtx;
         var backgroudWidth = 0;
         var backgroundHeight = 0;
 
-        backgroundImage.onload = function () {
-            backgroundCtx.canvas.width = this.width;
-            backgroundCtx.canvas.height = this.height;
-            local_canvas.width = this.width;
-            local_canvas.height = this.height;
-            backgroundCtx.drawImage(backgroundImage, 0, 0, this.width, this.height);
-        };
-        backgroundImage.src = this.props.backgroundImageUrl;
+        // backgroundImage.onload = function () {
+        //     backgroundCtx.canvas.width = this.width;
+        //     backgroundCtx.canvas.height = this.height;
+        //     local_canvas.width = this.width;
+        //     local_canvas.height = this.height;
+        //     backgroundCtx.drawImage(backgroundImage, 0, 0, this.width, this.height);
+        // };
+        // console.log("Backgtound url",this.props.backgroundImageUrl);
+        // backgroundImage.src = this.props.backgroundImageUrl;
 
+        // var foregroundImage = new Image;
+
+        // foregroundImage.onload = function () {
+        //     foregroundCtx.drawImage(foregroundImage, 0, 0, this.width, this.height);
+        // };
+        // foregroundImage.src = this.props.foregroundImageUrl;
 
         this.initTool(this.props.tool);
 
-        var foregroundImage = new Image;
 
-        foregroundImage.onload = function () {
-            foregroundCtx.drawImage(foregroundImage, 0, 0, this.width, this.height);
-        };
-        foregroundImage.src = this.props.foregroundImageUrl;
     }
 
-    componentWillReceiveProps({ tool, items }) {
+    componentWillReceiveProps(nextProps) {
+        const { tool, items } = nextProps;
         items
             .filter(item => this.props.items.indexOf(item) === -1)
             .forEach(item => {
@@ -95,6 +108,55 @@ export default class CustomCanvas extends Component {
                 this.tool.draw(item, this.props.animate);
             });
         this.initTool(tool);
+
+        const backgroundImageUrl = nextProps.backgroundImageUrl;
+        console.log("NEXT PROPSIKI");
+        console.log(nextProps);
+        const foregroundImageUrl = nextProps.foregroundImageUrl;
+        if ((backgroundImageUrl && backgroundImageUrl !== this.props.backgroundImageUrl) || 
+            (foregroundImageUrl && foregroundImageUrl !== this.props.foregroundImageUrl)) {
+            this.backgroundCanvas = findDOMNode(this.backgroundCanvasRef);
+            this.backgroundCtx = this.backgroundCanvas.getContext('2d');
+            this.canvas = findDOMNode(this.foregroundCanvasRef);
+            this.ctx = this.canvas.getContext('2d');
+
+            let updateButton = findDOMNode(this.buttonRef);
+            var foregroundCtx = this.ctx;
+            var local_canvas = this.canvas;
+
+            var backgroundImage = new Image;
+
+            var backgroundCtx = this.backgroundCtx;
+            var backgroudWidth = 0;
+            var backgroundHeight = 0;
+            let that = this;
+            backgroundImage.onload = function () {
+                backgroundCtx.canvas.width = this.width;
+                backgroundCtx.canvas.height = this.height;
+
+
+                updateButton.style.top = this.height;
+                local_canvas.width = this.width;
+                local_canvas.height = this.height;
+                backgroundCtx.drawImage(backgroundImage, 0, 0, this.width, this.height);
+                that.setState({
+                    styles: {
+                        position: "absolute",
+                        top: this.height,
+                        left: (this.width / 2) - 20
+                    }
+                });
+            };
+            backgroundImage.src = nextProps.backgroundImageUrl;
+
+            var foregroundImage = new Image;
+
+            foregroundImage.onload = function () {
+                foregroundCtx.drawImage(foregroundImage, 0, 0, this.width, this.height);
+            };
+            foregroundImage.src = nextProps.foregroundImageUrl;
+        }
+
     }
 
     initTool(tool) {
@@ -137,8 +199,24 @@ export default class CustomCanvas extends Component {
         ];
     }
 
+    updateMask() {
+        let canvas = findDOMNode(this.foregroundCanvasRef);
+        var pngUrl = canvas.toDataURL();
+        console.log(pngUrl);
+        let base64Data = pngUrl.replace('data:image/png;base64,', '');
+        console.log("Uploaded to" + this.props.dicomId + this.props.sliceId);
+        axios.put(`http://localhost:5001/api/Mask/${this.props.dicomId}&${this.props.sliceId}`, {mask: base64Data})
+        .then(function (response) {
+            console.log("Uploaded");
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    }
+
     render() {
-        const { width, height, canvasClassName } = this.props;
+        const { canvasClassName } = this.props;
+
         return (
             <div style={{ clear: "both", position: "relative", margin: "0 auto", width: "50%" }}>
                 <canvas
@@ -160,6 +238,10 @@ export default class CustomCanvas extends Component {
                     onMouseUp={this.onMouseUp}
 
                 />
+                <div ref={(button) => { this.buttonRef = button; }} style={this.state.styles}>
+                    <a onClick={this.updateMask} className="btn btn-primary clearfix">Update Mask</a>
+                </div>
+
             </div>
 
         )

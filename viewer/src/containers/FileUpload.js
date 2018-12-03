@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from 'axios';
 import Button from 'react-bootstrap-button-loader';
+import FileBase64 from 'react-file-base64';
 
 import "./FileUpload.css";
 
@@ -11,32 +12,35 @@ export default class FileUpload extends Component {
         this.state = {
             loading: false,
             uploadStatus: false,
-            fileName: null
+            fileName: null,
+            files: null
         }
         this.handleUploadImage = this.handleUploadImage.bind(this);
     }
-
 
     handleUploadImage(ev) {
         ev.preventDefault();
         this.setState({'loading': true});
 
-        const data = new FormData();
-        let dicom_file = this.uploadInput.files[0];
-        data.append('file', dicom_file);
-        var that = this;
-        let base64file = '';
-        this.getBase64(dicom_file, (result) => {
-            base64file = result.replace('data:application/dicom;base64,', '');
-            axios.post('http://localhost:5001/api/NewDicom', {'base64Dicom': base64file})
-            .then(function (response) {
-                that.setState({uploadStatus: true, loading: false, fileName: dicom_file.name });
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        let that = this;
+        let files_without_type = this.state.files;
+        axios.post('http://localhost:5001/api/NewDicom/UploadList', files_without_type)
+        .then(function (response) {
+            that.setState({uploadStatus: true, loading: false, fileName: "File" });
+        })
+        .catch(function (error) {
+            console.log(error);
         });
  
+    }
+
+    getFiles(files) {
+        let files_without_type = [];
+        for (let file of files) {
+            files_without_type.push({'base64Dicom': file.base64.replace('data:application/dicom;base64,', '')});
+        }
+        this.setState({files: files_without_type})
+
     }
 
     getBase64(file, cb) {
@@ -54,7 +58,10 @@ export default class FileUpload extends Component {
         return (
             <div className="container">
                 <div className="form-group">
-                    <input className="form-control" ref={(ref) => { this.uploadInput = ref; }} type="file" />
+                    <FileBase64
+                    className="form-control"
+                    multiple={ true }
+                    onDone={ this.getFiles.bind(this) } />
                 </div>
 
                 <Button loading={this.state.loading} className="btn btn-success" onClick={this.handleUploadImage} type='button'>{this.state.uploadStatus ? 'Done' : 'Upload' }</Button>

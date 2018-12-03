@@ -30,12 +30,13 @@ export default class Panel extends Component {
 
     getPatients() {
         const that = this;
-        fetch("http://localhost:5001/api/Patient")
+        fetch("http://localhost:5001/api/PatientData")
             .then(function (response) {
                 return response.json();
             })
             .then(jsonData => {
                 this.setState({ patients: jsonData });
+                console.log(jsonData);
             })
         // fetch('http://localhost:8000/patients')
         //     .then(({ results }) => this.setState({ patients: results }));
@@ -46,10 +47,10 @@ export default class Panel extends Component {
 
         }
         const patients = this.state.patients.map((patient, i) => (
-            <div key={patient.id} className="col-sm-3">
+            <div key={patient.dicomModelId} className="col-sm-3">
                 <div className="card card-default">
-                    <Link to={"/patient/" + patient.id} className="card-body">
-                        <p className="lead">{patient.name}</p>
+                    <Link to={"/patient/" + patient.dicomModelId} className="card-body">
+                        <p className="lead">{patient.patientName}</p>
                     </Link>
                 </div>
             </div>
