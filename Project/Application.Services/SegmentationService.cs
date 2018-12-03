@@ -24,9 +24,8 @@ namespace Application.Services
 
         public byte[] Calculate(int dicomId, int sliceId)
         {
-            //var image = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            //return Calculate(image.Image);
-            return Calculate(null);
+            var image = _dicomContext.DicomSlices.Find(dicomId, sliceId);
+            return Calculate(image.Image);
         }
 
         public byte[] Calculate(byte[] image)
