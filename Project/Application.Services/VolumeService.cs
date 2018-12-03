@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Application.Data.Context;
 using Application.Interfaces;
 using Application.Models;
 using AutoMapper;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Application.Services
 {
@@ -41,9 +44,36 @@ namespace Application.Services
         }
 
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation)
-        {            
-            //todo
+        {
+            var client = new RestClient("http://localhost:5000/predict_mask/");
+            var request = new RestRequest(Method.POST);
+            var requestObject = new VolumeRequest()
+            {
+                Masks = dicomId,
+                ImageInformation = imageInformation
+            };
+            var json = JsonConvert.SerializeObject(requestObject);
+            request.AddParameter("application/json", json, ParameterType.RequestBody);
+            var response = client.Execute(request);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var volume = JsonConvert.DeserializeObject<VolumeResponse>(response.Content);
+                return volume.Volume;
+            }
+
             return 0;
+        }
+
+        private class VolumeRequest
+        {
+            public IEnumerable<byte[]> Masks { get; set; }
+            public ImageInformation ImageInformation { get; set; }
+        }
+
+        private class VolumeResponse
+        {
+            public double Volume { get; set; }
         }
 
         public void Dispose()
