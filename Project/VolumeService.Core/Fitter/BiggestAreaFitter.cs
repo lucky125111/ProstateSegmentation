@@ -16,10 +16,12 @@ namespace VolumeService.Core.Fitter
             var contour = mat.FindContoursAsArray(RetrievalModes.External, ContourApproximationModes.ApproxSimple);
 
             if (!contour.Any())
-                return null;
+                return new List<Point>();
 
             var cont = contour.OrderByDescending(x => Cv2.ContourArea(x)).First();
-            Cv2.FillConvexPoly(mat, cont, Scalar.White, LineTypes.AntiAlias);
+            
+            var hull = Cv2.ConvexHull(cont);
+            Cv2.FillConvexPoly(mat, hull, Scalar.White, LineTypes.AntiAlias);
             mat.SaveImage($"{guid}HullPixel.png");
             return cont;
         }

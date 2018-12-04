@@ -14,7 +14,7 @@ namespace VolumeService.Core.Fitter
             var contour = mat.FindContoursAsArray(RetrievalModes.External, ContourApproximationModes.ApproxSimple);
             
             if (!contour.Any())
-                return null;
+                return new List<Point>();
 
             var cont = contour.SelectMany(x => x).ToList();
             var maxX = cont.Max(x => x.X);

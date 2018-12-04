@@ -45,8 +45,8 @@ namespace Application.Services
 
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation, string type)
         {
-            Console.WriteLine($"url http://volume:5002/api/Volume/{type}");
-            var client = new RestClient($"http://volume:5002/api/Volume/{type}");
+            Console.WriteLine($"url http://volume/api/Volume/{type}");
+            var client = new RestClient($"http://volume/api/Volume/{type}");
             var request = new RestRequest(Method.POST);
             var requestObject = new VolumeRequest()
             {

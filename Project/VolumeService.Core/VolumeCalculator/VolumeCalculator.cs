@@ -28,7 +28,7 @@ namespace VolumeService.Core.VolumeCalculator
 
             var spacing = imageInformation.PixelSpacingHorizontal ?? 1;
             var segmentsArea = CalculateAreas(contours, spacing);
-
+            File.WriteAllText($"res{fitterType}", $"segment area {fitterType} {Environment.NewLine} {String.Join(Environment.NewLine, segmentsArea)}");
             var distance = imageInformation.SpacingBetweenSlices ?? 1;
             var volume = CalculateVolume(distance, segmentsArea);
 
@@ -66,12 +66,12 @@ namespace VolumeService.Core.VolumeCalculator
             return volume;
         }
 
-        private static List<double> CalculateAreas(IEnumerable<IEnumerable<Point>> contours, double spacing)
+        public static List<double> CalculateAreas(IEnumerable<IEnumerable<Point>> contours, double spacing)
         {
             return contours.Select(contour => Cv2.ContourArea(contour) * spacing).ToList();
         }
 
-        private List<IEnumerable<Point>> FitImages(IEnumerable<byte[]> dicomId, ImageFitterType fitterType)
+        public List<IEnumerable<Point>> FitImages(IEnumerable<byte[]> dicomId, ImageFitterType fitterType)
         {
             var fitter = _generatorFactory(fitterType);
 
