@@ -52,6 +52,11 @@ export default class CustomCanvas extends Component {
                 position: "absolute",
                 top: 0,
                 left: 0
+            },
+            restoreMaskStyles: {
+                position: "absolute",
+                top: 0,
+                left: 0
             }
         };
         this.initTool = this.initTool.bind(this);
@@ -60,6 +65,7 @@ export default class CustomCanvas extends Component {
         this.onDebouncedMove = this.onDebouncedMove.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.updateMask = this.updateMask.bind(this);
+        this.restoreMask = this.restoreMask.bind(this);
     }
 
     componentDidMount() {
@@ -100,7 +106,7 @@ export default class CustomCanvas extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const { tool, items } = nextProps;
+        const { tool, items, showMask } = nextProps;
         items
             .filter(item => this.props.items.indexOf(item) === -1)
             .forEach(item => {
@@ -110,10 +116,8 @@ export default class CustomCanvas extends Component {
         this.initTool(tool);
 
         const backgroundImageUrl = nextProps.backgroundImageUrl;
-        console.log("NEXT PROPSIKI");
-        console.log(nextProps);
         const foregroundImageUrl = nextProps.foregroundImageUrl;
-        if ((backgroundImageUrl && backgroundImageUrl !== this.props.backgroundImageUrl) || 
+        if ((backgroundImageUrl && backgroundImageUrl !== this.props.backgroundImageUrl) ||
             (foregroundImageUrl && foregroundImageUrl !== this.props.foregroundImageUrl)) {
             this.backgroundCanvas = findDOMNode(this.backgroundCanvasRef);
             this.backgroundCtx = this.backgroundCanvas.getContext('2d');
@@ -133,8 +137,6 @@ export default class CustomCanvas extends Component {
             backgroundImage.onload = function () {
                 backgroundCtx.canvas.width = this.width;
                 backgroundCtx.canvas.height = this.height;
-
-
                 updateButton.style.top = this.height;
                 local_canvas.width = this.width;
                 local_canvas.height = this.height;
@@ -142,8 +144,13 @@ export default class CustomCanvas extends Component {
                 that.setState({
                     styles: {
                         position: "absolute",
-                        top: this.height,
-                        left: (this.width / 2) - 20
+                        top: this.height + 20,
+                        left: 0
+                    },
+                    restoreMaskStyles: {
+                        position: "absolute",
+                        top: this.height + 20,
+                        left: 140
                     }
                 });
             };
@@ -157,6 +164,19 @@ export default class CustomCanvas extends Component {
             foregroundImage.src = nextProps.foregroundImageUrl;
         }
 
+    }
+
+    drawforegroundImage(foregroundImageUrl) {
+        this.ctx = this.canvas.getContext('2d');
+        var foregroundCtx = this.ctx;
+        foregroundCtx.fillStyle = this.fill;
+        foregroundCtx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
+        var foregroundImage = new Image;
+
+        foregroundImage.onload = function () {
+            foregroundCtx.drawImage(foregroundImage, 0, 0, this.width, this.height);
+        };
+        foregroundImage.src = foregroundImageUrl;
     }
 
     initTool(tool) {
@@ -205,9 +225,28 @@ export default class CustomCanvas extends Component {
         console.log(pngUrl);
         let base64Data = pngUrl.replace('data:image/png;base64,', '');
         console.log("Uploaded to" + this.props.dicomId + this.props.sliceId);
-        axios.put(`http://localhost:5001/api/Mask/${this.props.dicomId}&${this.props.sliceId}`, {mask: base64Data})
+        axios.put(`http://localhost:5001/api/Mask/${this.props.dicomId}&${this.props.sliceId}`, { mask: base64Data })
+            .then(function (response) {
+                console.log("Uploaded");
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    restoreMask() {
+        var that = this;
+        axios.post(`http://localhost:5001/api/Mask/Recalculate/${this.props.dicomId}&${this.props.sliceId}`)
         .then(function (response) {
             console.log("Uploaded");
+            axios.get(`http://localhost:5001/api/Mask/${that.props.dicomId}&${that.props.sliceId}`)
+                .then(function(response){
+                    console.log(response);
+                    that.drawforegroundImage('data:image/png;base64,' + response.data['mask'])
+                })
+                .catch(function(error) {
+                    console.log(error);
+                })
+
         })
         .catch(function (error) {
             console.log(error);
@@ -215,8 +254,7 @@ export default class CustomCanvas extends Component {
     }
 
     render() {
-        const { canvasClassName } = this.props;
-
+        const { canvasClassName, showMask } = this.props;
         return (
             <div style={{ clear: "both", position: "relative", margin: "0 auto", width: "50%" }}>
                 <canvas
@@ -229,7 +267,7 @@ export default class CustomCanvas extends Component {
                     onMouseUp={this.onMouseUp}
                 />
                 <canvas
-                    style={{ zIndex: 1, position: "absolute", left: 0, top: 0 }}
+                    style={{ zIndex: 1, position: "absolute", left: 0, top: 0, display: showMask ? "block": "none" }}
                     ref={(canvas) => { this.foregroundCanvasRef = canvas; }}
                     className={canvasClassName}
                     onMouseDown={this.onMouseDown}
@@ -241,6 +279,10 @@ export default class CustomCanvas extends Component {
                 <div ref={(button) => { this.buttonRef = button; }} style={this.state.styles}>
                     <a onClick={this.updateMask} className="btn btn-primary clearfix">Update Mask</a>
                 </div>
+            
+                <div ref={(button) => { this.restoreMaskButtonRef = button; }} style={this.state.restoreMaskStyles}>
+                <a onClick={this.restoreMask} className="btn btn-primary clearfix">Restore Mask</a>
+            </div>
 
             </div>
 
