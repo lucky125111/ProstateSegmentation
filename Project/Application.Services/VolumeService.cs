@@ -31,16 +31,27 @@ namespace Application.Services
             return dicomModelEntity.ProstateVolume;
         }
 
-        public double CalculateVolume(int dicomId, string type)
+        public void CalculateVolume(int dicomId, string type)
         {
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId);
+            
             var masks = dto.Select(x => x.Mask);
-
+            
             var dicomModelEntity = _dicomContext.DicomModels.Find(dicomId);
-
+            
             var imageInformation = _mapper.Map<ImageInformation>(dicomModelEntity);
 
-            return CalculateVolume(masks, imageInformation, type);
+            var volume = CalculateVolume(masks, imageInformation, type);
+
+            UpdateVolume(dicomId, volume);
+        }
+
+        private void UpdateVolume(int dicomId, double volume)
+        {
+            var entry = _dicomContext.DicomModels.Find(dicomId);
+            entry.ProstateVolume = volume;
+            _dicomContext.Entry(entry).Property(p => p.ProstateVolume).IsModified = true;
+            _dicomContext.SaveChanges();
         }
 
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation, string type)
@@ -60,13 +71,11 @@ namespace Application.Services
             Console.WriteLine(response);
             Console.WriteLine(response.StatusCode);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var volume = JsonConvert.DeserializeObject<VolumeResponse>(response.Content);
-                return volume.Volume;
-            }
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new AppException("Calculate volume failed");
 
-            return 0;
+            var volume = JsonConvert.DeserializeObject<VolumeResponse>(response.Content);
+            return volume.Volume;
         }
 
         public void Dispose()

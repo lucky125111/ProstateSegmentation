@@ -39,12 +39,14 @@ namespace Application.Services
             Console.WriteLine(response);
             Console.WriteLine(response.Content);
             Console.WriteLine(response.StatusCode);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                Console.WriteLine("RESPONSE WAS SUCCESSFUL");
-                var maskBase64 = JsonConvert.DeserializeObject<SegmentationResult>(response.Content);
-                return Convert.FromBase64String(maskBase64.mask);
-            }
+            
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new AppException("Segmentation failed");
+            
+            Console.WriteLine("RESPONSE WAS SUCCESSFUL");
+            var maskBase64 = JsonConvert.DeserializeObject<SegmentationResult>(response.Content);
+            return Convert.FromBase64String(maskBase64.mask);
+
 
             return null;
         }
