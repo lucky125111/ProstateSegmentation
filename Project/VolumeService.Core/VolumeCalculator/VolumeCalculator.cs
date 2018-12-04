@@ -21,43 +21,61 @@ namespace VolumeService.Core.VolumeCalculator
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation,
             ImageFitterType fitterType)
         {
+            if (dicomId == null)
+                return 0;
+
             var contours = FitImages(dicomId, fitterType);
 
             var spacing = imageInformation.PixelSpacingHorizontal ?? 1;
+            var segmentsArea = CalculateAreas(contours, spacing);
 
-            CalculateAreas(contours, spacing);
+            var distance = imageInformation.SpacingBetweenSlices ?? 1;
+            var volume = CalculateVolume(distance, segmentsArea);
 
-            //calculate volume from areas
-
-
-
-            return 0;
+            return volume;
         }
 
-        private static List<double> CalculateAreas(List<IEnumerable<Point>> contours, double spacing)
+        public static double CalculateVolume(double distance, List<double> segmentsArea)
         {
-            var segmentsArea = new List<double>();
+            var volume = 0.0;
 
-            foreach (var contour in contours)
+            for (var i = 0; i < segmentsArea.Count - 1; i++)
             {
-                segmentsArea.Add(Cv2.ContourArea(contour) * spacing);
+                if(Math.Abs(segmentsArea[i]) < Double.Epsilon)
+                    continue;
+                
+                var inc = 1;
+                var j = i;
+                while (segmentsArea[j + inc] < Double.Epsilon)
+                {
+                    inc++;
+                    if (j + inc != segmentsArea.Count) 
+                        continue;
+                    if (volume > 0)
+                        return volume;
+
+                    j = i - 1;
+                    inc = 1;
+                    break;
+                }
+
+                var sliceVolume = (segmentsArea[i] + segmentsArea[j + inc]) * distance * inc / 2;
+                volume += sliceVolume;
             }
 
-            return segmentsArea;
+            return volume;
+        }
+
+        private static List<double> CalculateAreas(IEnumerable<IEnumerable<Point>> contours, double spacing)
+        {
+            return contours.Select(contour => Cv2.ContourArea(contour) * spacing).ToList();
         }
 
         private List<IEnumerable<Point>> FitImages(IEnumerable<byte[]> dicomId, ImageFitterType fitterType)
         {
             var fitter = _generatorFactory(fitterType);
 
-            var contours = new List<IEnumerable<Point>>();
-
-            foreach (var image in dicomId.Select(CreateMat))
-            {
-                contours.Add(fitter.FitImage(image).ToList());
-            }
-
-            return contours;
+            return dicomId.Select(CreateMat).Select(image => fitter.FitImage(image).ToList()).Cast<IEnumerable<Point>>().ToList();
         }
 
         private static Mat CreateMat(byte[] x)
@@ -65,7 +83,7 @@ namespace VolumeService.Core.VolumeCalculator
             var guid = Guid.NewGuid();
             var filename = $"{guid}.png";
             x.RenderBitmap().Save(filename, ImageFormat.Png);
-            Mat mat = new Mat(filename, ImreadModes.Grayscale);
+            var mat = new Mat(filename, ImreadModes.Grayscale);
             File.Delete(filename);
             return mat;
         }
