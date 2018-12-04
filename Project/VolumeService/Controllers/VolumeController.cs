@@ -18,26 +18,38 @@ namespace VolumeService.Controllers
         }
 
         [HttpPost("ConvexHull")]
-        public double CalculateVolume([FromBody] VolumeRequest request)
+        public VolumeResponse CalculateVolume([FromBody] VolumeRequest request)
         {
             Console.WriteLine(request);
-            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation,
+            var volume =  _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation,
                 ImageFitterType.ConvexHull);
+            return new VolumeResponse()
+            {
+                Volume = volume
+            };
         }
 
         [HttpPost("Simple")]
-        public double CalculateSimpleVolume([FromBody] VolumeRequest request)
+        public VolumeResponse CalculateSimpleVolume([FromBody] VolumeRequest request)
         {
             Console.WriteLine(request);
-            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation, ImageFitterType.Simple);
+            var volume = _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation, ImageFitterType.Simple);
+            return new VolumeResponse()
+            {
+                Volume = volume
+            };
         }
 
         [HttpPost("CountPixels")]
-        public double CalculateCountPixelsVolume([FromBody] VolumeRequest request)
+        public VolumeResponse CalculateCountPixelsVolume([FromBody] VolumeRequest request)
         {
             Console.WriteLine(request);
-            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation,
+            var volume =  _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation,
                 ImageFitterType.CountPixels);
+            return new VolumeResponse()
+            {
+                Volume = volume
+            };
         }
     }
 }

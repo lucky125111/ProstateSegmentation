@@ -28,9 +28,9 @@ namespace App.Controllers
         }
 
         [HttpGet("{id}")]
-        public double Get(int dicomId)
+        public double Get(int id)
         {
-            var volume = _volumeService.GetVolume(dicomId);
+            var volume = _volumeService.GetVolume(id);
             return volume;
         }
     }
