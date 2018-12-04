@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Application.Data.Context;
 using Application.Data.Entity;
 using Application.Dicom;
+using Application.Dicom.DicomModels;
 using Application.Interfaces;
 using Application.Models;
 using AutoMapper;
-using NewDicomModel = Application.Dicom.DicomModels.NewDicomModel;
 
 namespace Application.Services
 {
     public class NewDicomService : INewDicomService
     {
         private readonly DicomContext _dicomContext;
-        private readonly IMapper _mapper;
         private readonly IDicomConverter _dicomConverter;
+        private readonly IMapper _mapper;
         private readonly ISegmentationService _segmentationService;
 
         private bool _disposed;
@@ -56,13 +55,13 @@ namespace Application.Services
 
         public void AddToDicom(int id, NewDicomFileModel value)
         {
-            if(_dicomContext.DicomModels.Find(id) == null)
+            if (_dicomContext.DicomModels.Find(id) == null)
                 throw new AppException($"Patient {id} is not present in database");
 
             var model = _dicomConverter.OpenDicomAndConvertFromBase64(value.Base64Dicom);
 
             var patientId = _dicomContext.DicomPatientDatas.Find(id).PatientId;
-            if(model.DicomPatientData.PatientId != patientId)
+            if (model.DicomPatientData.PatientId != patientId)
                 throw new AppException(
                     $"It's not the same patient dicomId {id} has patient {patientId}, file patient id {model.DicomPatientData.PatientId}");
 
@@ -77,12 +76,15 @@ namespace Application.Services
 
             var dicomId = UploadNewDicom(newDicomFileModels.First());
 
-            foreach (var newDicomFileModel in newDicomFileModels.Skip(1))
-            {
-                AddToDicom(dicomId, newDicomFileModel);
-            }
+            foreach (var newDicomFileModel in newDicomFileModels.Skip(1)) AddToDicom(dicomId, newDicomFileModel);
 
             return dicomId;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         private bool PatientExits(string patientId)
@@ -103,12 +105,6 @@ namespace Application.Services
             slice.DicomModelId = dicomModel;
             slice.Mask = _segmentationService.Calculate(slice.Image);
             return slice;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

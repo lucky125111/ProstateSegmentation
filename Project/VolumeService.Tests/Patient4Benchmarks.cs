@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Application.Models;
-using OpenCvSharp;
 using VolumeService.Core;
 using VolumeService.Core.Fitter;
 using VolumeService.Core.VolumeCalculator;
@@ -12,8 +11,6 @@ namespace VolumeService.Tests
 {
     public class Patient4Benchmarks : VolumeServiceTestBase
     {
-        private readonly VolumeCalculator _volumeCalculator;
-
         public Patient4Benchmarks()
         {
             IImageFitter Func(ImageFitterType c)
@@ -33,13 +30,15 @@ namespace VolumeService.Tests
 
             _volumeCalculator = new VolumeCalculator(Func);
         }
-        
+
+        private readonly VolumeCalculator _volumeCalculator;
+
         [Fact]
-        public void SquareVolume()
+        public void BiggestAreaVolume()
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
+            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
         }
 
         [Fact]
@@ -51,11 +50,11 @@ namespace VolumeService.Tests
         }
 
         [Fact]
-        public void BiggestAreaVolume()
+        public void SquareVolume()
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
+            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
         }
     }
 }

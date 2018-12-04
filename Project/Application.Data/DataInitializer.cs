@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Application.Data.Context;
@@ -26,16 +25,13 @@ namespace Application.Data
             {
                 var d1 = dcmConverter.OpenDicomAndConvertFromFile(file);
 
-                var dicomPatientDataEntity = context.DicomPatientDatas.FirstOrDefault(x => x.PatientId == d1.DicomPatientData.PatientId);
+                var dicomPatientDataEntity =
+                    context.DicomPatientDatas.FirstOrDefault(x => x.PatientId == d1.DicomPatientData.PatientId);
 
                 if (dicomPatientDataEntity == null)
-                {
                     AddNewPatient(context, d1);
-                }
                 else
-                {
                     AddSlices(context, d1, dicomPatientDataEntity.DicomModelId);
-                }
             }
         }
 
@@ -51,7 +47,7 @@ namespace Application.Data
             context.DicomModels.Add(e1);
             context.SaveChanges();
 
-            var p = new DicomPatientDataEntity()
+            var p = new DicomPatientDataEntity
             {
                 PatientId = d1.DicomPatientData.PatientId,
                 DicomModelId = e1.DicomModelId,
@@ -65,12 +61,12 @@ namespace Application.Data
 
         private static void AddSlices(DicomContext context, NewDicomModel d1, int dicomModelId)
         {
-            context.DicomSlices.Add(new DicomSliceEntity()
+            context.DicomSlices.Add(new DicomSliceEntity
             {
                 Image = d1.DicomSlices.Image,
                 InstanceNumber = d1.DicomSlices.InstanceNumber,
                 SliceLocation = d1.DicomSlices.SliceLocation,
-                DicomModelId = dicomModelId,
+                DicomModelId = dicomModelId
             });
             context.SaveChanges();
         }

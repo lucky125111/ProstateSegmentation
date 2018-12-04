@@ -8,7 +8,7 @@ namespace Application.Services
     {
         public DicomFile CreateDicom(int id)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void Dispose()

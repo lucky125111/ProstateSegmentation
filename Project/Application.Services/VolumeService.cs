@@ -48,7 +48,7 @@ namespace Application.Services
             Console.WriteLine($"url http://volume/api/Volume/{type}");
             var client = new RestClient($"http://volume/api/Volume/{type}");
             var request = new RestRequest(Method.POST);
-            var requestObject = new VolumeRequest()
+            var requestObject = new VolumeRequest
             {
                 Masks = dicomId,
                 ImageInformation = imageInformation
@@ -69,17 +69,6 @@ namespace Application.Services
             return 0;
         }
 
-        private class VolumeRequest
-        {
-            public IEnumerable<byte[]> Masks { get; set; }
-            public ImageInformation ImageInformation { get; set; }
-        }
-
-        private class VolumeResponse
-        {
-            public double Volume { get; set; }
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -92,6 +81,17 @@ namespace Application.Services
                 if (disposing)
                     _dicomContext.Dispose();
             _disposed = true;
+        }
+
+        private class VolumeRequest
+        {
+            public IEnumerable<byte[]> Masks { get; set; }
+            public ImageInformation ImageInformation { get; set; }
+        }
+
+        private class VolumeResponse
+        {
+            public double Volume { get; set; }
         }
     }
 }

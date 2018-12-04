@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using Application.Dicom;
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using VolumeService.Core.Fitter;
 using Xunit;
 
@@ -12,12 +6,13 @@ namespace VolumeService.Tests
 {
     public class ConvexHullFitterTests : VolumeServiceTestBase
     {
-        private readonly ConvexHullFitter _convexHullFitter;
-
         public ConvexHullFitterTests()
         {
             _convexHullFitter = new ConvexHullFitter();
         }
+
+        private readonly ConvexHullFitter _convexHullFitter;
+
         [Fact]
         public void Prostate1Test()
         {

@@ -10,7 +10,7 @@ using AutoMapper;
 namespace Application.Services
 {
     public class SliceService : ISliceService
-    {        
+    {
         private readonly DicomContext _dicomContext;
         private readonly IMapper _mapper;
 
@@ -43,22 +43,22 @@ namespace Application.Services
         }
 
         public void UpdateSlice(int dicomId, int sliceId, SliceModel value)
-        {            
+        {
             var dto = _mapper.Map<DicomSliceEntity>(value);
             dto.DicomModelId = dicomId;
             dto.InstanceNumber = sliceId;
 
             var update = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(update == null)
+
+            if (update == null)
                 return;
-            
+
             _dicomContext.Entry(update).CurrentValues.SetValues(dto);
             _dicomContext.SaveChanges();
         }
 
         public void RemoveImage(int dicomId, int sliceId)
-        {            
+        {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
             _dicomContext.DicomSlices.Remove(dto);
             _dicomContext.SaveChanges();

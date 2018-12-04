@@ -15,6 +15,7 @@ namespace App.Controllers
         {
             _sliceService = sliceService;
         }
+
         [HttpGet("{dicomId}")]
         public IEnumerable<SliceModel> Get(int dicomId)
         {
@@ -28,7 +29,7 @@ namespace App.Controllers
             var slices = _sliceService.GetSlice(dicomId, sliceId);
             return slices;
         }
-        
+
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] SliceModel value)
         {
@@ -40,7 +41,7 @@ namespace App.Controllers
         {
             _sliceService.UpdateSlice(dicomId, sliceId, value);
         }
-        
+
         [HttpDelete("{dicomId}&{sliceId}")]
         public void Delete(int dicomId, int sliceId)
         {

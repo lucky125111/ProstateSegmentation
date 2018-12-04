@@ -15,14 +15,16 @@ namespace App.Controllers
         {
             _dicomService = dicomService;
         }
+
         [HttpPost]
         public int Post([FromBody] NewDicomFileModel value)
         {
             var modelId = _dicomService.UploadNewDicom(value);
             return modelId;
         }
+
         [HttpPost("{id}")]
-        public void Post(int id, [FromBody] NewDicomFileModel value)    
+        public void Post(int id, [FromBody] NewDicomFileModel value)
         {
             _dicomService.AddToDicom(id, value);
         }

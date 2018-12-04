@@ -25,8 +25,8 @@ namespace Application.Services
         public IEnumerable<ImageModel> GetAllImages(int dicomId)
         {
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No image for dicom {dicomId} were not found");
 
             return dto.Select(x => _mapper.Map<ImageModel>(x));
@@ -35,8 +35,8 @@ namespace Application.Services
         public ImageModel GetImage(int dicomId, int sliceId)
         {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
 
             return _mapper.Map<ImageModel>(dto);
@@ -52,10 +52,10 @@ namespace Application.Services
         }
 
         public void UdateImage(int dicomId, int sliceId, ImageModel value)
-        {            
+        {
             var update = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(update == null)
+
+            if (update == null)
                 throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
 
             update.Image = value.Image;
@@ -64,17 +64,17 @@ namespace Application.Services
         }
 
         public void RemoveImage(int dicomId, int sliceId)
-        {            
+        {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No patient data for dicom {dicomId}, slice {sliceId} is present");
 
             dto.Image = null;
             _dicomContext.Entry(dto).Property(p => p.Image).IsModified = true;
             _dicomContext.SaveChanges();
         }
-        
+
         public void Dispose()
         {
             Dispose(true);

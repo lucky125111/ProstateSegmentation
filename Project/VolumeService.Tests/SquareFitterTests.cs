@@ -6,12 +6,12 @@ namespace VolumeService.Tests
 {
     public class SquareFitterTests : VolumeServiceTestBase
     {
-        private readonly SquareFitter _convexHullFitter;
-
         public SquareFitterTests()
         {
             _convexHullFitter = new SquareFitter();
         }
+
+        private readonly SquareFitter _convexHullFitter;
 
         [Fact]
         public void Prostate1Test()
@@ -20,6 +20,7 @@ namespace VolumeService.Tests
 
             var newBitmap = _convexHullFitter.FitImage(bitmap);
         }
+
         [Fact]
         public void Prostate2Test()
         {

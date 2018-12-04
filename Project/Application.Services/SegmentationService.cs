@@ -5,7 +5,6 @@ using Application.Interfaces;
 using AutoMapper;
 using Newtonsoft.Json;
 using RestSharp;
-using RestSharp.Deserializers;
 
 namespace Application.Services
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using Application.Automapper;
-using Application.Data.Context;
+﻿using Application.Automapper;
 using AutoFixture;
 using AutoMapper;
 
@@ -8,8 +6,8 @@ namespace Application.Tests
 {
     public class ServiceTestBase
     {
-        protected  Fixture _fixture;
-        protected  IMapper _mapper;
+        protected Fixture _fixture;
+        protected IMapper _mapper;
 
         public ServiceTestBase()
         {

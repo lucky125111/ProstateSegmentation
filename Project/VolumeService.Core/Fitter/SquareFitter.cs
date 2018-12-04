@@ -12,7 +12,7 @@ namespace VolumeService.Core.Fitter
             var guid = Guid.NewGuid();
             mat.SaveImage($"{guid}Grayscale.png");
             var contour = mat.FindContoursAsArray(RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-            
+
             if (!contour.Any())
                 return new List<Point>();
 
@@ -21,12 +21,12 @@ namespace VolumeService.Core.Fitter
             var maxY = cont.Max(x => x.Y);
             var minX = cont.Min(x => x.X);
             var minY = cont.Min(x => x.Y);
-            var hull = new List<Point>()
+            var hull = new List<Point>
             {
                 new Point(minX, maxY),
                 new Point(minX, minY),
                 new Point(maxX, minY),
-                new Point(maxX, maxY),
+                new Point(maxX, maxY)
             };
             Cv2.FillConvexPoly(mat, hull, Scalar.White, LineTypes.AntiAlias);
             mat.SaveImage($"{guid}HullSimple.png");

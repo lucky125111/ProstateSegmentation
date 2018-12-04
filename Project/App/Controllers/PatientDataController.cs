@@ -15,6 +15,7 @@ namespace App.Controllers
         {
             _patientService = patientService;
         }
+
         [HttpGet]
         public IEnumerable<PatientDataModel> Get()
         {

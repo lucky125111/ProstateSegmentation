@@ -33,7 +33,7 @@ namespace Application.Data.Context
                 .HasMany(s => s.DicomImages)
                 .WithOne(g => g.DicomModelEntity)
                 .HasForeignKey(s => s.DicomModelId);
-            
+
             modelBuilder.Entity<DicomModelEntity>()
                 .HasKey(x => x.DicomModelId);
 

@@ -1,4 +1,3 @@
-using System;
 using Application.Automapper;
 using Application.Data.Entity;
 using Application.Models;
@@ -17,12 +16,23 @@ namespace Application.Tests
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new DicomInputToEntityModel()));
             _mapper = config.CreateMapper();
         }
-        
+
         [Fact]
         public void ConfigurationIsValidTest()
         {
             var config = new MapperConfiguration(cfg => cfg.AddProfile(new DicomInputToEntityModel()));
             config.AssertConfigurationIsValid();
+        }
+
+        [Fact]
+        public void DicomModelEntityToImageInformationTest()
+        {
+            var o = _fixture.Build<DicomModelEntity>().Without(p => p.DicomImages)
+                .Without(p => p.DicomPatientDataEntity).Create();
+
+            var res = _mapper.Map<ImageInformation>(o);
+
+            res.Should().NotBeNull();
         }
 
         [Fact]
@@ -36,9 +46,50 @@ namespace Application.Tests
         }
 
         [Fact]
+        public void DicomPatientDataEntityToPatientDataModelTest()
+        {
+            var o = _fixture.Build<DicomPatientDataEntity>().Without(p => p.DicomModelEntity).Create();
+
+            var res = _mapper.Map<PatientDataModel>(o);
+
+            res.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void DicomSliceEntityToImageModelTest()
+        {
+            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
+
+            var res = _mapper.Map<ImageModel>(o);
+
+            res.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void DicomSliceEntityToMaskModelTest()
+        {
+            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
+
+            var res = _mapper.Map<MaskModel>(o);
+
+            res.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void DicomSliceEntityToSliceModelTest()
+        {
+            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
+
+            var res = _mapper.Map<SliceModel>(o);
+
+            res.Should().NotBeNull();
+        }
+
+        [Fact]
         public void EnityToDicomModelTest()
         {
-            var o = _fixture.Build<DicomModelEntity>().Without(p => p.DicomImages).Without(p => p.DicomPatientDataEntity).Create();
+            var o = _fixture.Build<DicomModelEntity>().Without(p => p.DicomImages)
+                .Without(p => p.DicomPatientDataEntity).Create();
 
             var res = _mapper.Map<DicomModel>(o);
 
@@ -56,51 +107,11 @@ namespace Application.Tests
         }
 
         [Fact]
-        public void DicomSliceEntityToImageModelTest()
-        {
-            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
-
-            var res = _mapper.Map<ImageModel>(o);
-
-            res.Should().NotBeNull();
-        }
-
-        [Fact]
         public void MaskModelModelToDicomSliceEntityTest()
         {
             var o = _fixture.Build<MaskModel>().Create();
 
             var res = _mapper.Map<DicomSliceEntity>(o);
-
-            res.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void DicomSliceEntityToMaskModelTest()
-        {
-            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
-
-            var res = _mapper.Map<MaskModel>(o);
-
-            res.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void SliceModelModelToDicomSliceEntityTest()
-        {
-            var o = _fixture.Build<SliceModel>().Create();
-
-            var res = _mapper.Map<DicomSliceEntity>(o);
-
-            res.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void DicomSliceEntityToSliceModelTest()
-        {
-            var o = _fixture.Build<DicomSliceEntity>().Without(p => p.DicomModelEntity).Create();
-
-            var res = _mapper.Map<SliceModel>(o);
 
             res.Should().NotBeNull();
         }
@@ -116,21 +127,11 @@ namespace Application.Tests
         }
 
         [Fact]
-        public void DicomPatientDataEntityToPatientDataModelTest()
+        public void SliceModelModelToDicomSliceEntityTest()
         {
-            var o = _fixture.Build<DicomPatientDataEntity>().Without(p => p.DicomModelEntity).Create();
+            var o = _fixture.Build<SliceModel>().Create();
 
-            var res = _mapper.Map<PatientDataModel>(o);
-
-            res.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void DicomModelEntityToImageInformationTest()
-        {
-            var o = _fixture.Build<DicomModelEntity>().Without(p => p.DicomImages).Without(p => p.DicomPatientDataEntity).Create();
-
-            var res = _mapper.Map<ImageInformation>(o);
+            var res = _mapper.Map<DicomSliceEntity>(o);
 
             res.Should().NotBeNull();
         }

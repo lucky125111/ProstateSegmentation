@@ -6,7 +6,6 @@ using Application.Data.Entity;
 using Application.Interfaces;
 using Application.Models;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -32,7 +31,7 @@ namespace Application.Services
         public DicomModel GetDicomById(int id)
         {
             var dto = _dicomContext.DicomModels.Find(id);
-            if(dto == null)
+            if (dto == null)
                 throw new AppException($"Dicom {id} was not found");
             return _mapper.Map<DicomModel>(dto);
         }
@@ -46,12 +45,12 @@ namespace Application.Services
         }
 
         public void UpdateDicom(int id, DicomModel value)
-        { 
+        {
             var dto = _mapper.Map<DicomModelEntity>(value);
             dto.DicomModelId = id;
             var update = _dicomContext.DicomModels.Find(id);
-            
-            if(update == null)
+
+            if (update == null)
                 throw new AppException($"Dicom {id} was not found");
 
             _dicomContext.Entry(update).CurrentValues.SetValues(dto);
@@ -60,12 +59,14 @@ namespace Application.Services
 
         public void DeleteDicom(int id)
         {
-            if(_dicomContext.DicomSlices.Any(x => x.DicomModelId == id) || _dicomContext.DicomPatientDatas.Any(x => x.DicomModelId == id))
-                throw new AppException($"Cannot remove dicom {id} because it has dependencies");;
+            if (_dicomContext.DicomSlices.Any(x => x.DicomModelId == id) ||
+                _dicomContext.DicomPatientDatas.Any(x => x.DicomModelId == id))
+                throw new AppException($"Cannot remove dicom {id} because it has dependencies");
+            ;
 
             var dto = _dicomContext.DicomModels.Find(id);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"Dicom {id} was not found");
 
             _dicomContext.DicomModels.Remove(dto);
@@ -74,7 +75,7 @@ namespace Application.Services
 
         public IEnumerable<int> GetImageIndexes(int id)
         {
-            if(!_dicomContext.DicomSlices.Any(x => x.DicomModelId == id))
+            if (!_dicomContext.DicomSlices.Any(x => x.DicomModelId == id))
                 throw new AppException($"No images found for dicom {id}");
 
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == id).Select(x => x.InstanceNumber);

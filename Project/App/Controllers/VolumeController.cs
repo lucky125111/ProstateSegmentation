@@ -14,11 +14,11 @@ namespace App.Controllers
         {
             _volumeService = volumeService;
         }
-        
+
         [HttpPost("Calculate/{id}&{type}")]
         public void Recalculate(int id, string type)
         {
-            if(type != null && type != "Simple" && type != "ConvexHull" && type != "CountPixels")
+            if (type != null && type != "Simple" && type != "ConvexHull" && type != "CountPixels")
                 throw new AppException("type value can be either \"Simple\" or \"ConvexHull\" or \"CountPixels\"");
 
             if (type == null)

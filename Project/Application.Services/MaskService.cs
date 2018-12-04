@@ -20,11 +20,12 @@ namespace Application.Services
             _dicomContext = dicomContext;
             _mapper = mapper;
         }
+
         public IEnumerable<MaskModel> GetAll(int dicomId)
         {
             var dto = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No image for dicom {dicomId} were not found");
 
             return dto.Select(x => _mapper.Map<MaskModel>(x));
@@ -33,18 +34,18 @@ namespace Application.Services
         public MaskModel GetMask(int dicomId, int sliceId)
         {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
 
             return _mapper.Map<MaskModel>(dto);
         }
 
         public void UpdateMask(int dicomId, int sliceId, MaskModel value)
-        {            
+        {
             var update = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(update == null)
+
+            if (update == null)
                 throw new AppException($"No image for dicom {dicomId}, index {sliceId} were not found");
 
             update.Mask = value.Mask;
@@ -52,12 +53,12 @@ namespace Application.Services
             _dicomContext.SaveChanges();
         }
 
-        
+
         public void RemoveMask(int dicomId, int sliceId)
-        {            
+        {
             var dto = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            
-            if(dto == null)
+
+            if (dto == null)
                 throw new AppException($"No patient data for dicom {dicomId}, slice {sliceId} is present");
 
             dto.Mask = null;

@@ -9,14 +9,15 @@ namespace App.Controllers
     [ApiController]
     public class DicomController : ControllerBase
     {
-        private readonly IDicomService _dicomService;
         private readonly IFileCreatorService _creatorService;
+        private readonly IDicomService _dicomService;
 
         public DicomController(IDicomService dicomService, IFileCreatorService creatorService)
         {
             _dicomService = dicomService;
             _creatorService = creatorService;
         }
+
         [HttpGet]
         public IEnumerable<DicomModel> Get()
         {

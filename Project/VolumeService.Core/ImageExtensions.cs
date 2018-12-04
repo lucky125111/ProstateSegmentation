@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 
 namespace VolumeService.Core
@@ -12,13 +13,15 @@ namespace VolumeService.Core
             {
                 bmp = new Bitmap(ms);
             }
+
             return bmp;
         }
+
         public static byte[] ImageToByte(this Image img)
         {
             using (var stream = new MemoryStream())
             {
-                img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                img.Save(stream, ImageFormat.Png);
                 return stream.ToArray();
             }
         }

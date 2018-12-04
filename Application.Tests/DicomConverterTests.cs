@@ -7,19 +7,20 @@ namespace Application.Tests
 {
     public class DicomConverterTests : ServiceTestBase
     {
-        private DicomConverter _dicomConverter;
-
         public DicomConverterTests()
         {
             _dicomConverter = new DicomConverter();
         }
 
-        [Fact]
-        public void OpenDicomAndConvertFromFileTest()
-        {
-            var testFilePath = @"D:\Inzynierka\src\Data\Prostate3T-03-0001\1.3.6.1.4.1.14519.5.2.1.7307.2101.182382809090179976301292139745\1.3.6.1.4.1.14519.5.2.1.7307.2101.287009217605941401146066177219\000000.dcm";
+        private readonly DicomConverter _dicomConverter;
 
-            var dicomModel = _dicomConverter.OpenDicomAndConvertFromFile(testFilePath);
+        [Fact]
+        public void OpenDicomAndConvertFromByteTest()
+        {
+            var testFilePath =
+                @"D:\Inzynierka\src\Data\Prostate3T-03-0001\1.3.6.1.4.1.14519.5.2.1.7307.2101.182382809090179976301292139745\1.3.6.1.4.1.14519.5.2.1.7307.2101.287009217605941401146066177219\000000.dcm";
+            var testBytes = File.ReadAllBytes(testFilePath);
+            var dicomModel = _dicomConverter.OpenDicomAndConvertFromByte(testBytes);
 
             dicomModel.ImageHeight.Should().Be(384);
             dicomModel.ImageWidth.Should().Be(384);
@@ -32,12 +33,13 @@ namespace Application.Tests
         }
 
         [Fact]
-        public void OpenDicomAndConvertFromByteTest()
+        public void OpenDicomAndConvertFromFileTest()
         {
-            var testFilePath = @"D:\Inzynierka\src\Data\Prostate3T-03-0001\1.3.6.1.4.1.14519.5.2.1.7307.2101.182382809090179976301292139745\1.3.6.1.4.1.14519.5.2.1.7307.2101.287009217605941401146066177219\000000.dcm";
-            var testBytes = File.ReadAllBytes(testFilePath);
-            var dicomModel = _dicomConverter.OpenDicomAndConvertFromByte(testBytes);
-            
+            var testFilePath =
+                @"D:\Inzynierka\src\Data\Prostate3T-03-0001\1.3.6.1.4.1.14519.5.2.1.7307.2101.182382809090179976301292139745\1.3.6.1.4.1.14519.5.2.1.7307.2101.287009217605941401146066177219\000000.dcm";
+
+            var dicomModel = _dicomConverter.OpenDicomAndConvertFromFile(testFilePath);
+
             dicomModel.ImageHeight.Should().Be(384);
             dicomModel.ImageWidth.Should().Be(384);
 

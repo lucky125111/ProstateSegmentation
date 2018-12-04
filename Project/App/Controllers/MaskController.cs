@@ -2,7 +2,6 @@
 using Application.Interfaces;
 using Application.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace App.Controllers
 {
@@ -18,6 +17,7 @@ namespace App.Controllers
             _maskService = maskService;
             _segmentationService = segmentationService;
         }
+
         [HttpGet("{dicomId}")]
         public IEnumerable<MaskModel> Get(int dicomId)
         {
@@ -29,27 +29,26 @@ namespace App.Controllers
         public MaskModel Get(int dicomId, int sliceId)
         {
             var maskModels = _maskService.GetMask(dicomId, sliceId);
-            return maskModels;        
+            return maskModels;
         }
-        
+
         [HttpPut("{dicomId}&{sliceId}")]
         public void Put(int dicomId, int sliceId, [FromBody] MaskModel value)
         {
             _maskService.UpdateMask(dicomId, sliceId, value);
         }
-        
+
         [HttpPost("Recalculate/{dicomId}&{sliceId}")]
         public void Post(int dicomId, int sliceId)
         {
             var mask = _segmentationService.Calculate(dicomId, sliceId);
-            var maskModel = new MaskModel()
+            var maskModel = new MaskModel
             {
                 Mask = mask
             };
             _maskService.UpdateMask(dicomId, sliceId, maskModel);
-
         }
-        
+
         [HttpDelete("{dicomId}&{sliceId}")]
         public void Delete(int dicomId, int sliceId)
         {

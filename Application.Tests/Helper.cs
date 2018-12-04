@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Application.Dicom;
 using Dicom;
-using Dicom.Imaging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -27,7 +25,7 @@ namespace Application.Tests
 
         private readonly ITestOutputHelper output;
 
-        [Fact(Skip="helpers")]
+        [Fact(Skip = "helpers")]
         public void GenerateBase64FromDicom()
         {
             var f = Directory.GetFiles(_prostate000Path).Skip(1).First();
@@ -36,7 +34,7 @@ namespace Application.Tests
             File.WriteAllText("dicomBase64_1", base64);
         }
 
-        [Fact(Skip="helpers")]
+        [Fact(Skip = "helpers")]
         public void GenerateDicomTagClass()
         {
             var sb = new StringBuilder();
@@ -53,7 +51,7 @@ namespace Application.Tests
             File.WriteAllText("PatientData.cs", sb.ToString() ?? "null");
         }
 
-        [Fact(Skip="helpers")]
+        [Fact(Skip = "helpers")]
         public void GenerateImageFromSlice()
         {
             var path = Directory.GetFiles(_prostate000Path).First();

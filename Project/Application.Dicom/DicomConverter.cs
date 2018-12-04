@@ -46,7 +46,8 @@ namespace Application.Dicom
         private bool HasValidHeader(MemoryStream stream)
         {
             stream.Seek(128, SeekOrigin.Begin);
-            return stream.ReadByte() == 'D' && stream.ReadByte() == 'I' && stream.ReadByte() == 'C' && stream.ReadByte() == 'M';
+            return stream.ReadByte() == 'D' && stream.ReadByte() == 'I' && stream.ReadByte() == 'C' &&
+                   stream.ReadByte() == 'M';
         }
 
         private NewDicomModel CreateDicomModel(DicomFile dicomFile, DicomImage dicomImage)

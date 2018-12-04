@@ -1,19 +1,17 @@
-using System;
-using System.IO;
 using OpenCvSharp;
 using VolumeService.Core.Fitter;
 using Xunit;
 
 namespace VolumeService.Tests
 {
-    public class BiggestAreaFitterTests : VolumeServiceTestBase          
+    public class BiggestAreaFitterTests : VolumeServiceTestBase
     {
-        private readonly BiggestAreaFitter _convexHullFitter;
-
         public BiggestAreaFitterTests()
         {
             _convexHullFitter = new BiggestAreaFitter();
         }
+
+        private readonly BiggestAreaFitter _convexHullFitter;
 
         [Fact]
         public void Prostate1Test()
@@ -22,6 +20,7 @@ namespace VolumeService.Tests
 
             var newBitmap = _convexHullFitter.FitImage(bitmap);
         }
+
         [Fact]
         public void Prostate2Test()
         {

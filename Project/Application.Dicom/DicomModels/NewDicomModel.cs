@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Application.Dicom.DicomModels
+﻿namespace Application.Dicom.DicomModels
 {
     public class NewDicomModel
     {

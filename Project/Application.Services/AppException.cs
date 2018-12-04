@@ -12,7 +12,7 @@ namespace Application.Services
         {
         }
 
-        public AppException(string name, System.Exception innerException) : base(name, innerException)
+        public AppException(string name, Exception innerException) : base(name, innerException)
         {
         }
     }

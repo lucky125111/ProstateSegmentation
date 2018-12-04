@@ -18,7 +18,7 @@ namespace VolumeService
             builder.Register<Func<ImageFitterType, IImageFitter>>(c =>
             {
                 var context = c.Resolve<IComponentContext>();
-                return (language) =>
+                return language =>
                 {
                     switch (language)
                     {

@@ -28,7 +28,8 @@ namespace VolumeService.Core.VolumeCalculator
 
             var spacing = imageInformation.PixelSpacingHorizontal ?? 1;
             var segmentsArea = CalculateAreas(contours, spacing);
-            File.WriteAllText($"res{fitterType}", $"segment area {fitterType} {Environment.NewLine} {String.Join(Environment.NewLine, segmentsArea)}");
+            File.WriteAllText($"res{fitterType}",
+                $"segment area {fitterType} {Environment.NewLine} {string.Join(Environment.NewLine, segmentsArea)}");
             var distance = imageInformation.SpacingBetweenSlices ?? 1;
             var volume = CalculateVolume(distance, segmentsArea);
 
@@ -41,15 +42,15 @@ namespace VolumeService.Core.VolumeCalculator
 
             for (var i = 0; i < segmentsArea.Count - 1; i++)
             {
-                if(Math.Abs(segmentsArea[i]) < Double.Epsilon)
+                if (Math.Abs(segmentsArea[i]) < double.Epsilon)
                     continue;
-                
+
                 var inc = 1;
                 var j = i;
-                while (segmentsArea[j + inc] < Double.Epsilon)
+                while (segmentsArea[j + inc] < double.Epsilon)
                 {
                     inc++;
-                    if (j + inc != segmentsArea.Count) 
+                    if (j + inc != segmentsArea.Count)
                         continue;
                     if (volume > 0)
                         return volume;
@@ -75,7 +76,8 @@ namespace VolumeService.Core.VolumeCalculator
         {
             var fitter = _generatorFactory(fitterType);
 
-            return dicomId.Select(CreateMat).Select(image => fitter.FitImage(image).ToList()).Cast<IEnumerable<Point>>().ToList();
+            return dicomId.Select(CreateMat).Select(image => fitter.FitImage(image).ToList()).Cast<IEnumerable<Point>>()
+                .ToList();
         }
 
         private static Mat CreateMat(byte[] x)

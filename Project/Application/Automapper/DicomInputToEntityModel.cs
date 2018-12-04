@@ -25,7 +25,7 @@ namespace Application.Automapper
                 ;
             CreateMap<DicomSliceEntity, ImageModel>()
                 ;
-            
+
             CreateMap<MaskModel, DicomSliceEntity>()
                 .ForMember(dest => dest.Image, opt => opt.Ignore())
                 .ForMember(dest => dest.InstanceNumber, opt => opt.Ignore())
@@ -35,13 +35,13 @@ namespace Application.Automapper
                 ;
             CreateMap<DicomSliceEntity, MaskModel>()
                 ;
-            
+
             CreateMap<DicomSliceEntity, SliceModel>()
                 ;
             CreateMap<SliceModel, DicomSliceEntity>()
                 .ForMember(dest => dest.DicomModelEntity, opt => opt.Ignore())
                 ;
-            
+
             CreateMap<PatientDataModel, DicomPatientDataEntity>()
                 .ForMember(dest => dest.DicomModelId, opt => opt.Ignore())
                 .ForMember(dest => dest.DicomModelEntity, opt => opt.Ignore())

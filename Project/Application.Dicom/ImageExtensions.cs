@@ -24,11 +24,12 @@ namespace Application.Dicom
         public static byte[] ToBytesPng(this Bitmap bitmap)
         {
             byte[] result = null;
-            using (MemoryStream stream = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
                 bitmap.Save(stream, ImageFormat.Png);
                 result = stream.ToArray();
-            } 
+            }
+
             return result;
         }
 

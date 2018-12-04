@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
-using Point = OpenCvSharp.Point;
 
 namespace VolumeService.Core.Fitter
 {
