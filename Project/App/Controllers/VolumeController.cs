@@ -18,8 +18,8 @@ namespace App.Controllers
         [HttpPost("Calculate/{id}&{type}")]
         public void Recalculate(int id, string type)
         {
-            if(type != null && type != "Simple" && type != "ConvexHull")
-                throw new AppException("type value can be either \"Simple\" or \"ConvexHull\"");
+            if(type != null && type != "Simple" && type != "ConvexHull" && type != "CountPixels")
+                throw new AppException("type value can be either \"Simple\" or \"ConvexHull\" or \"CountPixels\"");
 
             if (type == null)
                 type = "ConvexHull";

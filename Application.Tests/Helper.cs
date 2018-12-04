@@ -62,8 +62,6 @@ namespace Application.Tests
             var x = c.OpenDicomAndConvertFromFile(path);
 
             var b = x.DicomSlices.Image.RenderBitmap(x.ImageWidth, x.ImageHeight);
-            
-            byte[] result = null;
 
             b.Save("obraz.png", ImageFormat.Png);
         }

@@ -45,6 +45,7 @@ namespace Application.Services
 
         public double CalculateVolume(IEnumerable<byte[]> dicomId, ImageInformation imageInformation, string type)
         {
+            Console.WriteLine($"url http://volume:5002/api/Volume/{type}");
             var client = new RestClient($"http://volume:5002/api/Volume/{type}");
             var request = new RestRequest(Method.POST);
             var requestObject = new VolumeRequest()
@@ -54,7 +55,6 @@ namespace Application.Services
             };
             var json = JsonConvert.SerializeObject(requestObject);
             request.AddParameter("application/json", json, ParameterType.RequestBody);
-
             Console.WriteLine(request);
             var response = client.Execute(request);
             Console.WriteLine(response);

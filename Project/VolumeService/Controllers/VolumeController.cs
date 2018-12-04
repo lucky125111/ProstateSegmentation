@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
+using VolumeService.Core;
+using VolumeService.Core.Fitter;
+using VolumeService.Core.VolumeCalculator;
 using VolumeService.Model;
 
 namespace VolumeService.Controllers
@@ -7,10 +11,26 @@ namespace VolumeService.Controllers
     [ApiController]
     public class VolumeController : ControllerBase
     {
-        [HttpPost]
-        public double CalculateVolume(VolumeRequest request)
+        private readonly IVolumeCalculator _volumeCalculator;
+
+        public VolumeController(IVolumeCalculator volumeCalculator)
         {
-            return 1;
+            _volumeCalculator = volumeCalculator;
+        }
+        [HttpPost("ConvexHull")]
+        public double CalculateVolume([FromBody] VolumeRequest request)
+        {
+            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation, ImageFitterType.ConvexHull);
+        }
+        [HttpPost("Simple")]
+        public double CalculateSimpleVolume([FromBody] VolumeRequest request)
+        {
+            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation, ImageFitterType.Simple);
+        }
+        [HttpPost("CountPixels")]
+        public double CalculateCountPixelsVolume([FromBody] VolumeRequest request)
+        {
+            return _volumeCalculator.CalculateVolume(request.Masks, request.ImageInformation, ImageFitterType.CountPixels);
         }
     }
 }
