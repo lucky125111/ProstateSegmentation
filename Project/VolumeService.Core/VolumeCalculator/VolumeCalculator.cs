@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Application.Models;
 using OpenCvSharp;
 using VolumeService.Core.Fitter;

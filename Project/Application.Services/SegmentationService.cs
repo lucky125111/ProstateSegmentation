@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using Application.Data.Context;
 using Application.Interfaces;
+using Application.Models;
 using AutoMapper;
 using Newtonsoft.Json;
 using RestSharp;
@@ -14,17 +16,33 @@ namespace Application.Services
         private readonly IMapper _mapper;
 
         private bool _disposed;
+        private IMaskService _maskService;
 
-        public SegmentationService(DicomContext dicomContext, IMapper mapper)
+        public SegmentationService(DicomContext dicomContext, IMapper mapper, IMaskService maskService)
         {
             _dicomContext = dicomContext;
             _mapper = mapper;
+            _maskService = maskService;
         }
 
-        public byte[] Calculate(int dicomId, int sliceId)
+        public void Calculate(int dicomId)
+        {
+            var images = _dicomContext.DicomSlices.Where(x => x.DicomModelId == dicomId).Select(x => x.InstanceNumber);
+            foreach (var image in images)
+            {
+                Calculate(dicomId, image);
+            }
+        }
+
+        public void Calculate(int dicomId, int sliceId)
         {
             var image = _dicomContext.DicomSlices.Find(dicomId, sliceId);
-            return Calculate(image.Image);
+            var mask = Calculate(image.Image);
+            var maskModel = new MaskModel
+            {
+                Mask = mask
+            };
+            _maskService.UpdateMask(dicomId, sliceId, maskModel);
         }
 
         public byte[] Calculate(byte[] image)
@@ -47,8 +65,6 @@ namespace Application.Services
             var maskBase64 = JsonConvert.DeserializeObject<SegmentationResult>(response.Content);
             return Convert.FromBase64String(maskBase64.mask);
 
-
-            return null;
         }
 
         public void Dispose()

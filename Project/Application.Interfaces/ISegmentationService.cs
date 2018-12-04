@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Application.Interfaces
 {
     public interface ISegmentationService : IDisposable
     {
-        byte[] Calculate(int dicomId, int sliceId);
+        void Calculate(int dicomId, int sliceId);
         byte[] Calculate(byte[] image);
+        void Calculate(int dicomId);
     }
 }

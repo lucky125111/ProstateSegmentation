@@ -41,12 +41,13 @@ namespace App.Controllers
         [HttpPost("Recalculate/{dicomId}&{sliceId}")]
         public void Post(int dicomId, int sliceId)
         {
-            var mask = _segmentationService.Calculate(dicomId, sliceId);
-            var maskModel = new MaskModel
-            {
-                Mask = mask
-            };
-            _maskService.UpdateMask(dicomId, sliceId, maskModel);
+            _segmentationService.Calculate(dicomId, sliceId);
+        }
+        
+        [HttpPost("Recalculate/{dicomId}")]
+        public void RecalculateAll(int dicomId)
+        {
+            _segmentationService.Calculate(dicomId);
         }
 
         [HttpDelete("{dicomId}&{sliceId}")]
