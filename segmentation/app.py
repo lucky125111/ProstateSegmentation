@@ -21,6 +21,7 @@ def predict_base64_mask():
         base64_image = request.get_json()['image']
         np_image = np.array(convert_base64_to_image(base64_image))
         base64_predicted_mask = predict_mask(np_image)
+        print(base64_predicted_mask)
         return jsonify({'mask': base64_predicted_mask})
 
 if __name__ == "__main__":
