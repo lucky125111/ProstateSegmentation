@@ -37,7 +37,7 @@ export default class FileUpload extends Component {
     getFiles(files) {
         let files_without_type = [];
         for (let file of files) {
-            files_without_type.push({'base64Dicom': file.base64.replace('data:application/dicom;base64,', '')});
+            files_without_type.push({'base64Dicom': file.base64.replace('data:application/dicom;base64,', '').replace('data:application/octet-stream;base64,','')});
         }
         this.setState({files: files_without_type})
 
@@ -64,7 +64,9 @@ export default class FileUpload extends Component {
                     onDone={ this.getFiles.bind(this) } />
                 </div>
 
-                <Button loading={this.state.loading} className="btn btn-success" onClick={this.handleUploadImage} type='button'>{this.state.uploadStatus ? 'Done' : 'Upload' }</Button>
+                {!this.state.uploadStatus ?
+                    <Button loading={this.state.loading} className="btn btn-success" onClick={this.handleUploadImage} type='button'>{this.state.uploadStatus ? 'Done' : 'Upload' }</Button>
+                    : null}
                 {this.state.uploadStatus ? <p>Patient {this.state.fileName} has been added.</p>: null}
 
             </div>
