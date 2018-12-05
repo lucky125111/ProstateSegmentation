@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Toggle from 'react-bootstrap-toggle';
 
 import "./ImageEditor.css";
+import axios from "axios/index";
 
 export default class ImageEditor extends Component {
     constructor(props) {
@@ -13,7 +14,7 @@ export default class ImageEditor extends Component {
 
         this.state = {
             tool: TOOL_PENCIL,
-            size: 2,
+            size: 10,
             color: 'rgba(255,0,0,0.5)',
             items: [],
             patientData: null,
@@ -21,7 +22,8 @@ export default class ImageEditor extends Component {
             maskUrl: null,
             currentImgIndex: 0,
             indices: [],
-            toggleActive: true
+            toggleActive: true,
+            volume: 0
         }
         this.moveRight = this.moveRight.bind(this);
         this.moveLeft = this.moveLeft.bind(this);
@@ -65,6 +67,29 @@ export default class ImageEditor extends Component {
                 console.log(jsonData);
                 this.setState({ indices: jsonData, currentImgIndex: jsonData[0] });
                 this.loadSliceAndMask(jsonData[0]);
+            })
+    }
+
+    calculatePatientVolume(type) {
+        const patientId = this.props.match.params.patientId;
+        const that = this;
+
+        axios.post(`http://localhost:5001/api/Volume/Calculate/${patientId}&${type}`)
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        fetch(`http://localhost:5001/api/Volume/${patientId}`)
+            .then(function (response) {
+                console.log(response);
+                return response.json();
+            })
+            .then(jsonData => {
+                console.log(jsonData);
+                this.setState({ volume: jsonData});
             })
     }
 
@@ -158,10 +183,10 @@ export default class ImageEditor extends Component {
                             <p>Volume</p>
                         </div>
                         <div className="panel-body form-group">
-                            <button style={{ marginRight: "10px", marginBottom: "10px" }} className="btn btn-primary">Calculate with Convex </button>
-                            <button style={{ marginRight: "10px", marginBottom: "10px" }} className="btn btn-primary">Calculate with Biggest </button>
-                            <button style={{ marginRight: "10px", marginBottom: "10px" }} className="btn btn-primary">Calculate with Square </button>
-                            <input type="decimal" className="form-control" disabled/>
+                            <button style={{ marginRight: "10px", marginBottom: "10px" }} onClick={() => this.calculatePatientVolume("ConvexHull")} className="btn btn-primary">Calculate with Convex </button>
+                            <button style={{ marginRight: "10px", marginBottom: "10px" }} onClick={() => this.calculatePatientVolume("Simple")} className="btn btn-primary">Calculate with Square </button>
+                            <button style={{ marginRight: "10px", marginBottom: "10px" }} onClick={() => this.calculatePatientVolume("CountPixels")} className="btn btn-primary">Calculate with Biggest </button>
+                            <input type="decimal" className="form-control" value={this.state.volume} disabled/>
                         </div>
                     </div>
                         <div style={{ margin: "auto", width: "50%" }}>
@@ -173,7 +198,7 @@ export default class ImageEditor extends Component {
                                     on={"Show mask"}
                                     off={"Hide mask"}
                                     active={this.state.toggleActive}
-                                ></Toggle>
+                                />
                             </div>
 
                             <div className="tools" style={{ marginBottom: 20 }}>
@@ -181,12 +206,12 @@ export default class ImageEditor extends Component {
                                     style={tool === TOOL_PENCIL ? { fontWeight: 'bold' } : undefined}
                                     className={(tool === TOOL_PENCIL ? 'item-active' : 'item') + ' btn btn-default'}
                                     onClick={() => this.setState({ tool: TOOL_PENCIL, color: "rgba(255,0,0,0.5)" })}
-                                ><i className="glyphicon glyphicon-pencil"></i>Pencil</button>
+                                ><i className="glyphicon glyphicon-pencil"/>Pencil</button>
                                 <button
                                     style={tool === TOOL_RUBBER ? { fontWeight: 'bold' } : undefined}
                                     className={(tool === TOOL_RUBBER ? 'item-active' : 'item') + ' btn btn-default'}
                                     onClick={() => this.setState({ tool: TOOL_RUBBER, color: "rgba(0,0,0,1)" })}
-                                ><i className="glyphicon glyphicon-erase"></i>Rubber</button>
+                                ><i className="glyphicon glyphicon-erase"/>Rubber</button>
                             </div>
 
                             <div className="options" style={{ marginBottom: 20 }}>
