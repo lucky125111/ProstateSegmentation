@@ -38,7 +38,8 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
+            File.WriteAllText($"resvol{ImageFitterType.CountPixels}",$"volume {ImageFitterType.CountPixels} {volume}");
         }
 
         [Fact]
@@ -46,7 +47,8 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.ConvexHull);
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.ConvexHull);
+            File.WriteAllText($"resvol{ImageFitterType.ConvexHull}",$"volume {ImageFitterType.ConvexHull} {volume}");
         }
 
         [Fact]
@@ -54,7 +56,37 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
+            File.WriteAllText($"resvol{ImageFitterType.Simple}",$"volume {ImageFitterType.Simple} {volume}");
+        }
+
+        [Fact]
+        public void Hispital()
+        {
+            var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
+
+            var contours = _volumeCalculator.FitImages(bytes, ImageFitterType.Simple);
+
+            var segmentsArea = _volumeCalculator.CalculateAreas(contours, 1);
+
+            var maxVol = segmentsArea.Max(x => x);
+            var distance = 1;
+
+            var min = -1;
+            var max = -1;
+
+            for (int i = 0; i < segmentsArea.Count; i++)
+            {
+                if(segmentsArea[i] > 0 && min == -1)
+                    min = i;
+
+                if (max == -1 && segmentsArea[segmentsArea.Count - i - 1] > 0)
+                    max = segmentsArea.Count - i;
+            }
+
+            var volume = maxVol * (max - min);
+            File.WriteAllText($"res",$"area {maxVol}");
+            File.WriteAllText($"resvol",$"volume {volume}");
         }
     }
 }
