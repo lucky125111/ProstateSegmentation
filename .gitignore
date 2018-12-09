@@ -469,3 +469,4 @@ ASALocalRun/
 App/data/mssql/data/
 
 App/data/mssql/
+.DS_Store

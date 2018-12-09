@@ -2,17 +2,20 @@ import React, { Component } from "react";
 import { Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import FileUpload from './FileUpload';
+import PacsImporter from './PacsImporter';
 import 'filepond/dist/filepond.min.css';
 import "./Panel.css";
 
 export default class Panel extends Component {
     constructor(props) {
         super(props);
-        this.handleShow = this.handleShow.bind(this);
+        this.handleShowUpload = this.handleShowUpload.bind(this);
+        this.handleShowImport = this.handleShowImport.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.state = {
             patients: [],
-            show: false
+            show: false,
+            type: ''
         };
     }
 
@@ -20,8 +23,13 @@ export default class Panel extends Component {
         this.setState({ show: false });
     }
 
-    handleShow() {
-        this.setState({ show: true });
+    handleShowUpload() {
+        this.setState({ show: true, type: 'upload'});
+    }
+
+    handleShowImport() {
+        this.setState({ show: true, type: 'import'});
+
     }
 
     componentDidMount() {
@@ -56,21 +64,24 @@ export default class Panel extends Component {
             </div>
 
         ));
+        const ModalContent = this.state.type === 'upload' ? <FileUpload/> : <PacsImporter/>;
 
         return (
             <div>
                 <Modal show={this.state.show} onHide={this.handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Modal heading</Modal.Title>
+                        <Modal.Title>{this.state.type === 'upload' ? "Upload Patient": "Import Patient" }</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <FileUpload />
+                        {ModalContent}
 
                     </Modal.Body>
                 </Modal>
                 <div className="clearfix">
-                    <button className="btn btn-success pull-right" onClick={this.handleShow} ><i className="glyphicon glyphicon-plus"></i>Add new patient</button>
-                </div>
+                    <button className="btn btn-success pull-right" onClick={this.handleShowUpload} ><i className="glyphicon glyphicon-plus"></i>Add new patient</button>
+                    <button className="btn btn-primary pull-right" onClick={this.handleShowImport} ><i className="glyphicon glyphicon-plus"></i>Import patient from PACS</button>
+
+                    </div>
                 <hr />
                 <div id="layout-content" className="layout-content-wrapper">
                     <div className="row">{patients}</div>
