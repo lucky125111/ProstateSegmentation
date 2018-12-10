@@ -33,4 +33,9 @@ services:
       dockerfile: VolumeService/Dockerfile    
     ports:
       - "5002:80"
-
+  orthanc:
+    container_name: orthanc
+    image: jodogne/orthanc
+    ports:
+      - "8042:8042"
+      - "4242:4242"
