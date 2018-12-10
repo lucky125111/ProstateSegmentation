@@ -11,7 +11,7 @@ namespace VolumeService.Tests
         [Fact]
         public void EmptyList()
         {
-            var l = new List<double>();
+            var l = new List<double?>();
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -21,7 +21,7 @@ namespace VolumeService.Tests
         [Fact]
         public void ListWithFirstValue()
         {
-            var l = new List<double> {1, 0, 0, 0, 0};
+            var l = new List<double?> {1, 0, 0, 0, 0};
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -31,7 +31,7 @@ namespace VolumeService.Tests
         [Fact]
         public void ListWithGapValues()
         {
-            var l = new List<double> {1, 0, 0, 1, 0};
+            var l = new List<double?> {1, 0, 0, 1, 0};
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -41,7 +41,7 @@ namespace VolumeService.Tests
         [Fact]
         public void ListWithSingleValue()
         {
-            var l = new List<double> {0, 0, 1, 0, 0};
+            var l = new List<double?> {0, 0, 1, 0, 0};
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -51,7 +51,7 @@ namespace VolumeService.Tests
         [Fact]
         public void ListWithTwoValues()
         {
-            var l = new List<double> {0, 0, 1, 1, 0};
+            var l = new List<double?> {0, 0, 1, 1, 0};
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -61,7 +61,7 @@ namespace VolumeService.Tests
         [Fact]
         public void ListWithZeros()
         {
-            var l = new List<double> {0, 0, 0};
+            var l = new List<double?> {0, 0, 0};
 
             var vol = VolumeCalculator.CalculateVolume(1.0, l);
 
@@ -72,7 +72,7 @@ namespace VolumeService.Tests
         [Fact]
         public void Null()
         {
-            List<double> l = null;
+            List<double?> l = null;
 
             Action action = () => VolumeCalculator.CalculateVolume(1.0, l);
 

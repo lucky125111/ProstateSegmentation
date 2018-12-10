@@ -7,14 +7,14 @@ namespace VolumeService.Core.Fitter
 {
     public class SquareFitter : IImageFitter
     {
-        public IEnumerable<Point> FitImage(Mat mat)
+        public double? FitImage(Mat mat)
         {
             var guid = Guid.NewGuid();
             mat.SaveImage($"{guid}Grayscale.png");
             var contour = mat.FindContoursAsArray(RetrievalModes.External, ContourApproximationModes.ApproxSimple);
 
             if (!contour.Any())
-                return new List<Point>();
+                return null;
 
             var cont = contour.SelectMany(x => x).ToList();
             var maxX = cont.Max(x => x.X);
@@ -30,7 +30,7 @@ namespace VolumeService.Core.Fitter
             };
             Cv2.FillConvexPoly(mat, hull, Scalar.White, LineTypes.AntiAlias);
             mat.SaveImage($"{guid}HullSimple.png");
-            return hull;
+            return Cv2.CountNonZero(mat);
         }
     }
 }

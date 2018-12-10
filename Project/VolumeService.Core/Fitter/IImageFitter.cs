@@ -5,6 +5,6 @@ namespace VolumeService.Core.Fitter
 {
     public interface IImageFitter
     {
-        IEnumerable<Point> FitImage(Mat bitmap);
+        double? FitImage(Mat bitmap);
     }
 }

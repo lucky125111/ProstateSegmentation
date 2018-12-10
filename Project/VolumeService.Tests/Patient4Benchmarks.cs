@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Application.Models;
+using OpenCvSharp;
 using VolumeService.Core;
 using VolumeService.Core.Fitter;
 using VolumeService.Core.VolumeCalculator;
@@ -38,7 +40,7 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
+            var volume = CalculateBiggestAreaVolume(bytes);
             File.WriteAllText($"resvol{ImageFitterType.CountPixels}",$"volume {ImageFitterType.CountPixels} {volume}");
         }
 
@@ -46,8 +48,7 @@ namespace VolumeService.Tests
         public void ConvexHullVolume()
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
-
-            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.ConvexHull);
+            var volume = CalculateConvexHullVolume(bytes);
             File.WriteAllText($"resvol{ImageFitterType.ConvexHull}",$"volume {ImageFitterType.ConvexHull} {volume}");
         }
 
@@ -56,7 +57,7 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
+            var volume = CalculateSquareVolume(bytes);
             File.WriteAllText($"resvol{ImageFitterType.Simple}",$"volume {ImageFitterType.Simple} {volume}");
         }
 
@@ -65,28 +66,95 @@ namespace VolumeService.Tests
         {
             var bytes = Directory.GetFiles(Patient4).Select(File.ReadAllBytes);
 
-            var contours = _volumeCalculator.FitImages(bytes, ImageFitterType.Simple);
-
-            var segmentsArea = _volumeCalculator.CalculateAreas(contours, 1);
-
-            var maxVol = segmentsArea.Max(x => x);
-            var distance = 1;
-
-            var min = -1;
-            var max = -1;
-
-            for (int i = 0; i < segmentsArea.Count; i++)
-            {
-                if(segmentsArea[i] > 0 && min == -1)
-                    min = i;
-
-                if (max == -1 && segmentsArea[segmentsArea.Count - i - 1] > 0)
-                    max = segmentsArea.Count - i;
-            }
-
-            var volume = maxVol * (max - min);
-            File.WriteAllText($"res",$"area {maxVol}");
+            var volume = CalculateHospitalVolume(bytes);
             File.WriteAllText($"resvol",$"volume {volume}");
         }
+
+        private double CalculateHospitalVolume(IEnumerable<byte[]> bytes)
+        {
+            var fitter = new SquareFitter();
+
+            var contours = bytes.Select(VolumeCalculator.CreateMat).Select(image => fitter.FitImage(image) * 0.5 * 0.5)
+                .ToList();
+
+            var distance =  4;
+            var volume = contours.Sum(x => x ?? 0) * distance;
+            
+            return volume;
+        }
+
+        
+        private double CalculateVoxelVolume(IEnumerable<byte[]> bytes)
+        {
+            var fitter = new ConvexHullFitter();
+
+            var contours = bytes.Select(VolumeCalculator.CreateMat).Select(image => fitter.FitImage(image) * 0.5 * 0.5)
+                .ToList();
+
+            var distance =  4;
+            var volume = contours.Sum(x => x ?? 0) * distance;
+            
+            return volume;
+        }
+
+        private double CalculateSquareVolume(IEnumerable<byte[]> bytes)
+        {
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.Simple);
+            return volume;
+        }
+
+        private double CalculateBiggestAreaVolume(IEnumerable<byte[]> bytes)
+        {
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.CountPixels);
+            return volume;
+        }
+
+        private double CalculateConvexHullVolume(IEnumerable<byte[]> bytes)
+        {
+            var volume = _volumeCalculator.CalculateVolume(bytes, new ImageInformation(), ImageFitterType.ConvexHull);
+            return volume;
+        }
+        
+        protected readonly string Patients =
+            Path.Combine(@"D:\Downloads\Chrome\images3\images");
+
+        [Fact]
+        public void InzTest()
+        {
+            var patients = Directory.GetDirectories(Patients);
+            if(File.Exists($"Wyniki.csv"))
+                File.Delete($"Wyniki.csv");
+
+            //File.WriteAllText($"Wyniki.csv",$"pacjent,szpital, trapez, otoczka najwiekszy,kwadrat,otoczka cala{Environment.NewLine}");
+            File.WriteAllText($"Wyniki.csv",$"pacjent,hosp,trp, biggest, square, hull{Environment.NewLine}");
+            foreach (var patient in patients)
+            {
+                if(!Directory.Exists(Path.Combine(patient, "contest"))
+                   || !Directory.Exists(Path.Combine(patient, "mask")))
+                    continue;
+
+                var bytesCont = Directory.GetFiles(Path.Combine(patient, "contest")).OrderBy(x => {
+                    var num = Path.GetFileNameWithoutExtension(x).Split('_').Last();
+                    int o;
+                    Int32.TryParse(num, out o);
+                    return o;
+                }).Select(File.ReadAllBytes);
+                var volumeHos = (int) CalculateHospitalVolume(bytesCont) / 1000;
+                var volumeTr = (int) CalculateVoxelVolume(bytesCont) / 1000;
+
+                var bytesPred = Directory.GetFiles(Path.Combine(patient, "mask")).OrderBy(x => {
+                    var num = Path.GetFileNameWithoutExtension(x).Split('_').Last();
+                    int o;
+                    Int32.TryParse(num, out o);
+                    return o;
+                }).Select(File.ReadAllBytes);
+
+                var volumeBiggest = (int) CalculateBiggestAreaVolume(bytesPred) / 1000;
+                var volumeSquare = (int) CalculateSquareVolume(bytesPred) / 1000;
+                var volumeHull = (int) CalculateConvexHullVolume(bytesPred) / 1000;
+                File.AppendAllText($"Wyniki.csv",$"{Path.GetFileName(patient)},{volumeHos},{volumeTr},{volumeBiggest},{volumeSquare},{volumeHull}{Environment.NewLine}");
+            }
+        }
+
     }
 }

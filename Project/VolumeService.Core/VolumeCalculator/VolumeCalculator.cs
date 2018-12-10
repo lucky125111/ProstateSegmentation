@@ -25,63 +25,72 @@ namespace VolumeService.Core.VolumeCalculator
             if (dicomId == null)
                 return 0;
 
-            var contours = FitImages(dicomId, fitterType);
+            var fitter = _generatorFactory(fitterType);
 
-            var spacing = imageInformation.PixelSpacingHorizontal ?? 1;
-            var segmentsArea = CalculateAreas(contours, spacing);
-            File.WriteAllText($"res{fitterType}",
-                $"segment area {fitterType} {Environment.NewLine} {string.Join(Environment.NewLine, segmentsArea)}");
-            var distance = imageInformation.SpacingBetweenSlices ?? 1;
-            var volume = CalculateVolume(distance, segmentsArea);
+            var spacingX = imageInformation.PixelSpacingHorizontal ?? 0.5;
+            var spacingY = imageInformation.PixelSpacingHorizontal ?? 0.5;
+
+            //var spacingX = imageInformation.PixelSpacingHorizontal ?? 1;
+            //var spacingY = imageInformation.PixelSpacingHorizontal ?? 1;
+
+            var contours = dicomId.Select(CreateMat).Select(image => fitter.FitImage(image) * spacingX * spacingY)
+                .ToList();
+
+            var distance = imageInformation.SpacingBetweenSlices ?? 4;
+            //var distance = imageInformation.SpacingBetweenSlices ?? 2;
+            var volume = CalculateVolume(distance, contours);
 
             return volume;
         }
 
-        public static double CalculateVolume(double distance, List<double> segmentsArea)
+        public static double CalculateVolume(double distance, List<double?> segmentsArea)
         {
             var volume = 0.0;
 
-            for (var i = 0; i < segmentsArea.Count - 1; i++)
+            var any = false;
+            for (int i = 0; i < segmentsArea.Count; i++)
             {
-                if (Math.Abs(segmentsArea[i]) < double.Epsilon)
-                    continue;
-
-                var inc = 1;
-                var j = i;
-                while (segmentsArea[j + inc] < double.Epsilon)
+                if (!any && segmentsArea[i] > 0)
                 {
-                    inc++;
-                    if (j + inc != segmentsArea.Count)
-                        continue;
-                    if (volume > 0)
-                        return volume;
-
-                    j = i - 1;
-                    inc = 1;
-                    break;
+                    any = true;
                 }
 
-                var sliceVolume = (segmentsArea[i] + segmentsArea[j + inc]) * distance * inc / 2;
-                volume += sliceVolume;
+                if(segmentsArea[i].HasValue)
+                    volume += segmentsArea[i].Value;
+                else if (!segmentsArea[i].HasValue && any)
+                {
+                    var min = -1;
+                    var max = -1;
+                    
+                    for (int j = i; j < segmentsArea.Count; j++)
+                    {
+                        if (segmentsArea[j].HasValue)
+                        {
+                            max = j;
+                            break;
+                        }
+                    }
+
+                    if (max == -1)
+                        break;
+
+                    for (int j = i; j >= 0; j--)
+                    {
+                        if (segmentsArea[j].HasValue)
+                        {
+                            min = j;
+                            break;
+                        }
+                    }
+
+                    volume += (segmentsArea[min].Value * (i - min) / i * segmentsArea[max].Value * (max - i) / i);
+                }
             }
-
-            return volume;
+            
+            return volume * distance;
         }
 
-        public static List<double> CalculateAreas(IEnumerable<IEnumerable<Point>> contours, double spacing)
-        {
-            return contours.Select(contour => Cv2.ContourArea(contour) * spacing).ToList();
-        }
-
-        public List<IEnumerable<Point>> FitImages(IEnumerable<byte[]> dicomId, ImageFitterType fitterType)
-        {
-            var fitter = _generatorFactory(fitterType);
-
-            return dicomId.Select(CreateMat).Select(image => fitter.FitImage(image).ToList()).Cast<IEnumerable<Point>>()
-                .ToList();
-        }
-
-        private static Mat CreateMat(byte[] x)
+        public static Mat CreateMat(byte[] x)
         {
             var guid = Guid.NewGuid();
             var filename = $"{guid}.png";
