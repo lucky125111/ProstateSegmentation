@@ -10,6 +10,7 @@ Application has microservice architecture (runs on docker), the main components 
 * Volume calculation service
 * Image segmentation service
 * SQL database
+
 ![https://raw.githubusercontent.com/lucky125111/InzynierkaDocs/master/Architektura.png](https://raw.githubusercontent.com/lucky125111/InzynierkaDocs/master/Architektura.png)
 
 ## Features
